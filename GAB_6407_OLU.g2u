@@ -1,0 +1,547 @@
+﻿Program.Sub.ScreenSU.Start
+Gui.frmMain..Create(BaseForm)
+Gui.frmMain..Caption("Labor Charge From OEE (6407) - Online Update")
+Gui.frmMain..Size(339,126)
+Gui.frmMain..MinX(0)
+Gui.frmMain..MinY(0)
+Gui.frmMain..Position(0,0)
+Gui.frmMain..AlwaysOnTop(False)
+Gui.frmMain..FontName("Tahoma")
+Gui.frmMain..FontSize(8.25)
+Gui.frmMain..ControlBox(False)
+Gui.frmMain..MaxButton(False)
+Gui.frmMain..MinButton(False)
+Gui.frmMain..MousePointer(0)
+Gui.frmMain..Moveable(True)
+Gui.frmMain..Sizeable(False)
+Gui.frmMain..ShowInTaskBar(True)
+Gui.frmMain..TitleBar(True)
+Gui.frmMain.pbProcess.Create(ProgressBar)
+Gui.frmMain.pbProcess.Visible(False)
+Gui.frmMain.pbProcess.Size(299,18)
+Gui.frmMain.pbProcess.Position(20,17)
+Gui.frmMain.lblProcess.Create(Label,"Step 1: Processing Record 0 of 0",False,296,13,0,22,46,True,0,"Tahoma",8.25,,0,1)
+Gui.frmMain.lblProcess.BorderStyle(0)
+Gui.frmMain.lblUpload.Create(Label,"Step 2: Uploading 0 Recods. Please wait........",False,296,13,0,22,67,True,0,"Tahoma",8.25,,0,1)
+Gui.frmMain.lblUpload.BorderStyle(0)
+Program.Sub.ScreenSU.End
+
+Program.Sub.Preflight.Start
+V.Global.sSQL.Declare(String)
+V.Global.sErrorDescription.Declare(String)
+V.Global.dProcessDate.Declare(Date)
+V.Global.bFileUploaded.Declare(Boolean,False)
+V.Global.bFileIsEmpty.Declare(Boolean,False)
+V.Global.bIsStillRunning.Declare(Boolean,False)
+Program.External.Include.Library("GAB_6407_Common.lib",False)
+
+'Used in GAB_6407_COMMON.lib
+V.Global.sString.Declare(String)
+V.Global.sLastStartTime.Declare(String)
+V.Global.sLastEndTime.Declare(String)
+V.Global.sCallerPgrm.Declare(String)
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+F.Intrinsic.Control.Try
+	V.Local.sProcessIDfile.Declare
+	v.Local.bExists.Declare
+	v.Local.sCheckFile.Declare
+	V.Local.sQuery.Declare
+	V.Local.sLastStartTime.Declare
+	V.Local.sLastEndTime.Declare
+	V.Local.sFile.Declare
+	V.Local.sProcessMsg.Declare
+	V.Local.sRet.Declare
+	V.Local.sFilter.Declare
+	V.Local.iCnt.Declare
+	
+	Function.Intrinsic.UI.UsePixels ' Allows you to use Pixels instead of Twips throughout
+	
+	'Open database connection to GLOBAL_ccc
+	F.ODBC.Connection!PSQL_con.OpenCompanyConnection(120)
+	
+	F.Intrinsic.String.Build("{0}\GAB_6407_PID_{1}.txt",v.Caller.GasDir,v.Caller.CompanyCode,v.Local.sProcessIDfile)
+	F.Intrinsic.file.Exists(v.Local.sProcessIDfile,v.Local.bExists)
+	'No file existed
+	F.Intrinsic.control.If(v.Local.bExists.Not)
+		F.Intrinsic.File.String2File(v.Local.sProcessIDfile,v.Ambient.PID)
+	
+	'There is file PID
+	F.Intrinsic.control.Else
+		F.Intrinsic.File.File2String(v.Local.sProcessIDfile,v.Local.sCheckFile)
+		
+		'check if the file is blank
+		'File is not blank
+		F.Intrinsic.Control.If(v.Local.sCheckFile,<>,"")
+			F.Intrinsic.task.PIDRunning(v.Local.sCheckFile,v.Local.bExists)
+			'Other PID stops running
+			F.Intrinsic.Control.If(v.Local.bExists.Not)
+				F.intrinsic.File.String2File(v.Local.sProcessIDfile,v.Ambient.PID)
+			
+			'Other PID is still running	
+			F.Intrinsic.Control.Else
+				V.Global.bIsStillRunning.Set(True)
+				F.Intrinsic.Control.CallSub("Unload")
+			F.Intrinsic.Control.EndIf
+			
+		'There is file PID but blank	
+		F.Intrinsic.Control.Else
+			F.intrinsic.File.String2File(v.Local.sProcessIDfile,v.Ambient.PID)
+		F.Intrinsic.Control.EndIf
+	F.Intrinsic.Control.EndIf
+		
+	'Check Custom Tables
+	F.Intrinsic.Control.CallSub(CheckCustomTable)
+	
+	V.Global.bFileUploaded.Set(False)
+	V.Global.bFileIsEmpty.Set(False)
+	
+	'server name: WIN-CGVC44EO0MA
+	'user name: GSSuser
+	'password:GSSuser1234
+	'database name: [OEEMS_v2]
+	'view name:[V_OEE]
+	'Open database connection to MS SQL Server
+	F.ODBC.Connection!MSSQL_con.OpenConnection("Provider=SQLOLEDB;Initial Catalog=OEEMS_v2;Data Source=10.0.0.206;User ID=GSSuser;Password=GSSuser1234;")
+	
+	'Get Last End Time processed
+	F.ODBC.Connection!PSQL_con.ExecuteAndReturn("SELECT TOP 1 LastStartTime, LastEndTime FROM GAB_6407_LAST_TRAN ORDER BY DateTimeOccur DESC;",V.Local.sRet)
+	F.Intrinsic.Control.If(V.Local.sRet.Trim,=,"")
+'		V.Local.sLastStartTime.Set("2021-06-14 11:35:05.967")
+'		V.Local.sLastEndTime.Set("2021-06-14 11:35:05.967")
+	F.Intrinsic.Control.Else
+		F.Intrinsic.String.Split(V.Local.sRet,"*!*",V.Local.sRet)
+		V.Local.sLastStartTime.Set(V.Local.sRet(0).Trim)
+		V.Local.sLastEndTime.Set(V.Local.sRet(1).Trim)
+	F.Intrinsic.Control.EndIf
+	
+'	V.Local.sLastStartTime.Set("2021-08-23 16:13:50.017")
+'	V.Local.sLastEndTime.Set("2021-08-24 13:11:20.523")
+	
+	'Select the data from OEE
+	F.Intrinsic.String.Build("SELECT TOP 201 Job As WorkOrder, Suffix As PartNo, Sequence As Seq, DateTransaction, Workcenter, CAST(Employee AS VARCHAR(5)) AS Employee, CONVERT(VARCHAR,StartTime,121) As StartTime, CONVERT(VARCHAR,EndTime,121) As EndTime, HoursWorked, Closed, GoodPieces, BadPieces, ScrapCode FROM V_OEE WHERE EndTime >= '{0}' ORDER BY EndTime, DateTransaction",V.Local.sLastEndTime,V.Local.sQuery)
+'	F.Intrinsic.String.Build("SELECT TOP 201 Job As WorkOrder, Suffix As PartNo, Sequence As Seq, DateTransaction, Workcenter, CAST(Employee AS VARCHAR(5)) AS Employee, CONVERT(VARCHAR,StartTime,121) As StartTime, CONVERT(VARCHAR,EndTime,121) As EndTime, HoursWorked, Closed, GoodPieces, BadPieces, ScrapCode FROM V_OEE WHERE EndTime >= '{0}' AND EndTime <= '{1}' ORDER BY EndTime, DateTransaction",V.Local.sLastStartTime,V.Local.sLastEndTime,V.Local.sQuery)
+	F.Data.DataTable.CreateFromSQL("dtOEE","MSSQL_con",V.Local.sQuery,True)
+	
+	'Remove the possibility of having selected the record that has been processed in the last sequence of the previous run
+	F.Intrinsic.String.Build("StartTime = '{0}' and EndTime = '{1}'",V.Local.sLastStartTime,V.Local.sLastEndTime,V.Local.sFilter)
+	F.Data.DataTable.Select("dtOEE",V.Local.sFilter,V.Local.sRet)
+	F.Intrinsic.Control.If(V.Local.sRet,<>,"***NORETURN***")
+		F.Intrinsic.String.Split(V.Local.sRet,"*!*",V.Local.sRet)
+		F.Intrinsic.Control.For(V.Local.iCnt,0,V.Local.sRet.UBound,1)
+			F.Data.DataTable.DeleteRow("dtOEE",V.Local.sRet(V.Local.iCnt))
+		F.Intrinsic.Control.Next(V.Local.iCnt)
+		F.Data.DataTable.AcceptChanges("dtOEE")
+	F.Intrinsic.Control.EndIf
+	
+'	'To Be Removed - Testing Only
+'	'Export to CSV 
+'	F.Data.DataTable.SaveToCSV("dtOEE","\\GSSDB\Apps\Global\Plugins\Gab\Gas\GAB_6407_dtOEE.CSV",True)
+'	'To Be Removed - Testing Only
+	
+	'Add a temporary columns
+	F.Data.DataTable.AddColumn("dtOEE","Failed","Boolean",False)
+	F.Data.DataTable.AddColumn("dtOEE","ErrorMessage","String","")
+	
+	'Show the main form
+	Gui.frmMain..Show
+	
+	'Set the Progress Bar
+	Gui.frmMain.pbProcess.Min(0)
+	F.Intrinsic.Control.If(V.DataTable.dtOEE.RowCount,=,0)
+		Gui.frmMain.pbProcess.Max(100)
+	F.Intrinsic.Control.Else
+		Gui.frmMain.pbProcess.Max(V.DataTable.dtOEE.RowCount)
+	F.Intrinsic.Control.EndIf
+	Gui.frmMain.pbProcess.Value(0)
+	Gui.frmMain.pbProcess.Visible(True)
+	Gui.frmMain.lblProcess.Visible(True)
+	F.Intrinsic.String.Build("Step 1: Processing Record {0} of {1}",0,V.DataTable.dtOEE.RowCount,V.Local.sProcessMsg)
+	Gui.frmMain.lblProcess.Caption(V.Local.sProcessMsg)
+	
+	F.Intrinsic.String.Build("Step 2: Uploading {0} Records. Please wait...",V.DataTable.dtOEE.RowCount,V.Local.sProcessMsg)
+	Gui.frmMain.lblUpload.Caption(V.Local.sProcessMsg)
+	Gui.frmMain.lblUpload.Visible(False)
+	
+	V.Global.dProcessDate.Set(V.Ambient.Now)
+	V.Global.sCallerPgrm.Set("ONLINE")
+	F.Intrinsic.Control.CallSub(ProcessData)
+	
+	F.Intrinsic.String.Build("Step 1: Processing Record {0} of {1}. Completed.",V.Screen.frmMain!pbProcess.Value,V.DataTable.dtOEE.RowCount,V.Local.sProcessMsg)
+	Gui.frmMain.lblProcess.Caption(V.Local.sProcessMsg)
+		
+	'Set Progress Bar Upload to Visible
+	Gui.frmMain.pbProcess.Scrolling(True)
+	Gui.frmMain.lblUpload.Visible(True)
+	
+	F.Intrinsic.Control.If(V.Global.sString.Trim,<>,"")
+		'Save Tab Delimited File and Upload records from tab delimited file into JOBS_IN_PROCESS - Online Update must be running in order for these records to get posted to JOB_DETAIL
+		F.Intrinsic.String.Build("{0}\{1}{2}MOPEN.txt",V.Caller.FilesDir,V.Caller.CompanyCode,V.Caller.Terminal,V.Local.sFile)
+		F.Intrinsic.File.String2File(V.Local.sFile,V.Global.sString)
+		F.Intrinsic.Task.LaunchGSSSync("JB0455","-C",V.Local.sFile)
+		
+		'Set the Flag that the records are uploaded to database
+		V.Global.bFileUploaded.Set(True)
+	F.Intrinsic.Control.Else
+		V.Global.bFileIsEmpty.Set(True)
+	F.Intrinsic.Control.EndIf
+	
+	F.Intrinsic.String.Build("Step 2: Uploading {0} Records. Completed",V.DataTable.dtOEE.RowCount,V.Local.sProcessMsg)
+	Gui.frmMain.lblUpload.Caption(V.Local.sProcessMsg)
+	
+	'Update the Flag_Indirect to 'S' for those Job Sequence that is Setup sequence
+	'Have to do this because JB0455 only support 'D' (Direct) and 'I' (Indirect) Flag
+	F.ODBC.Connection!PSQL_con.Execute("update JOBS_IN_PROCESS set FLAG_INDIRECT = 'S' from JOBS_IN_PROCESS A INNER JOIN JOB_OPERATIONS B ON A.JOB = B.JOB and A.SUFFIX = B.SUFFIX and A.SEQUENCE = B.SEQ AND B.FLAG_SET_UP = 'Y'")
+
+	F.Intrinsic.Control.CallSub(Unload)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Left(v.Ambient.ErrorDescription.Trim,850,V.Global.sErrorDescription)
+	F.Intrinsic.String.Build("Insert into GAB_6407_Error (DateTimeOccur,Description) values (Now(),'{0} Sub: {1} {2}')",v.Ambient.ErrorNumber,v.Ambient.CurrentSubroutine,V.Global.sErrorDescription.PSQLFriendly,V.Global.sSQL)
+	F.ODBC.Connection!PSQL_con.Execute(V.Global.sSQL)
+	F.Intrinsic.Control.CallSub(Unload)
+F.Intrinsic.Control.EndTry
+Program.Sub.Main.End
+
+Program.Sub.Unload.Start
+F.Intrinsic.Control.Try
+	V.Local.sMapper.Declare
+	V.Local.sQuery.Declare
+	V.Local.sProcessDate.Declare
+	V.Local.sFileName.Declare
+	V.Local.sFileDir.Declare
+	V.Local.bExists.Declare
+	V.Local.sFileDate.Declare
+	
+	F.Intrinsic.Control.If(V.Global.bFileUploaded)
+		F.Intrinsic.String.Format(V.Global.dProcessDate,"yyyy-mm-dd Hh:Nn:Ss.000",V.Local.sProcessDate)
+		F.Intrinsic.String.Format(V.Global.dProcessDate,"yyyymmdd_HhNnSs",V.Local.sFileDate)
+			
+		'Export to CSV 
+		F.Intrinsic.String.Build("{0}\CUSTOM\6407\{1}",V.Caller.GlobalDir,V.Caller.CompanyCode,V.Local.sFileDir)
+		F.Intrinsic.String.Build("{0}\GAB_6407_OEE_{1}.csv",V.Local.sFileDir,V.Local.sFileDate,V.Local.sFileName)
+		F.Intrinsic.File.DirExists(V.Local.sFileDir,V.Local.bExists)
+		F.Intrinsic.Control.If(V.Local.bExists.Not)
+			F.Intrinsic.File.CreateDir(V.Local.sFileDir)
+		F.Intrinsic.Control.EndIf
+		F.Data.DataTable.SaveToCSV("dtOEE",V.Local.sFilename,True)
+
+		'Save the failed transaction to GAB_6407_FAILED_TRAN table
+		F.Data.DataView.Create("dtOEE","dvFailed",22,"Failed = True","DateTransaction, EndTime")
+		F.Data.DataView.ToDataTable("dtOEE","dvFailed","dtFailed",True)
+		F.Data.DataTable.RemoveColumn("dtFailed","Failed")
+		F.Data.DataTable.AddColumn("dtFailed","DateTimeOccur","Date")
+		F.Data.DataTable.SetValue("dtFailed",-1,"DateTimeOccur",V.Local.sProcessDate)
+		F.Data.DataTable.AddColumn("dtFailed","Line","Long",0)
+		F.Data.DataTable.SetSeries("dtFailed","Line",1,1)
+		F.Data.DataTable.AcceptChanges("dtFailed")
+		
+		V.Local.sMapper.Set("DateTimeOccur@!@DateTimeOccur*!*Line@!@Line*!*WorkOrder@!@Job*!*PartNo@!@Suffix*!*Seq@!@Sequence*!*DateTransaction@!@DateTransaction*!*Workcenter@!@Workcenter*!*Employee@!@Employee*!*StartTime@!@StartTime*!*EndTime@!@EndTime*!*HoursWorked@!@HoursWorked*!*Closed@!@Closed*!*GoodPieces@!@GoodPieces*!*BadPieces@!@BadPieces*!*ScrapCode@!@ScrapCode*!*ErrorMessage@!@ErrorMessage")
+		F.Data.DataTable.SaveToDB("dtFailed","PSQL_con","GAB_6407_FAILED_TRAN","",128,V.Local.sMapper)
+		F.Data.DataTable.Close("dtFailed")
+		F.Data.DataView.Close("dtOEE","dvFailed")
+		
+		'Insert into GAB_6407_LAST_TRAN with the last EndTime processed
+		F.Intrinsic.String.Format(V.Global.dProcessDate,"yyyy-mm-dd Hh:Nn:Ss.000",V.Local.sProcessDate)
+		
+		F.Intrinsic.String.Build("INSERT INTO GAB_6407_LAST_TRAN (DateTimeOccur,LastStartTime,LastEndTime,GS_User) VALUES('{0}','{1}','{2}','{3}')",V.Local.sProcessDate,V.Global.sLastStartTime,V.Global.sLastEndTime,"ONLINE",V.Local.sQuery)
+		F.ODBC.Connection!PSQL_con.Execute(V.Local.sQuery)
+	F.Intrinsic.Control.Else
+		F.Intrinsic.Control.If(V.Global.bIsStillRunning.Not)
+		F.Intrinsic.Control.AndIf(V.Global.bFileIsEmpty.Not)
+			V.Global.sErrorDescription.Set("File NOT uploaded to database successfully.")
+			F.Intrinsic.String.Build("INSERT INTO GAB_6407_ERROR (DateTimeOccur,Description) values (Now(),'UNKNOWN Sub: Unload {0}')",V.Global.sErrorDescription.PSQLFriendly,V.Global.sSQL)
+			F.ODBC.Connection!PSQL_con.Execute(V.Global.sSQL)
+		F.Intrinsic.Control.EndIf
+	F.Intrinsic.Control.EndIf
+	
+'	'TO BE REMOVED LATER
+'	F.ODBC.Connection!PSQL_con.Execute("DELETE FROM JOBS_IN_PROCESS;")
+'	'TO BE REMOVED LATER
+	
+	F.Intrinsic.Control.If(V.DataTable.dtOEE.Exists)
+		F.Data.DataTable.Close("dtOEE")
+	F.Intrinsic.Control.EndIf
+	
+	F.Intrinsic.Control.If(V.ODBC.MSSQL_con.State,=,1)
+		F.ODBC.Connection!MSSQL_con.Close
+	F.Intrinsic.Control.EndIf
+
+	F.Intrinsic.Control.If(V.ODBC.PSQL_con.State,=,1)
+		F.ODBC.Connection!PSQL_con.Close
+	F.Intrinsic.Control.EndIf
+	
+	F.Intrinsic.Control.End
+	
+F.Intrinsic.Control.Catch
+	f.Intrinsic.Control.End
+F.Intrinsic.Control.EndTry
+Program.Sub.Unload.End
+
+Program.Sub.CheckCustomTable.Start
+F.Intrinsic.Control.Try
+	V.Local.bTableExists.Declare
+	
+	F.ODBC.Connection!PSQL_con.TableExists("GAB_6407_ERROR",V.Local.bTableExists)
+	F.Intrinsic.Control.If(V.Local.bTableExists.Not)
+		F.ODBC.Connection!PSQL_con.Execute("CREATE TABLE GAB_6407_ERROR(DateTimeOccur DATETIME, Description VARCHAR(1000));")
+	F.Intrinsic.Control.EndIf
+	
+	F.ODBC.Connection!PSQL_con.TableExists("GAB_6407_LAST_TRAN",V.Local.bTableExists)
+	F.Intrinsic.Control.If(V.Local.bTableExists.Not)
+		F.ODBC.Connection!PSQL_con.Execute("CREATE TABLE GAB_6407_LAST_TRAN(DateTimeOccur DATETIME, LastStartTime VARCHAR(23), LastEndTime VARCHAR(23), GS_User VARCHAR(8));")
+	F.Intrinsic.Control.EndIf
+	
+	F.ODBC.Connection!PSQL_con.TableExists("GAB_6407_FAILED_TRAN",V.Local.bTableExists)
+	F.Intrinsic.Control.If(V.Local.bTableExists.Not)
+'		F.ODBC.Connection!PSQL_con.Execute("CREATE TABLE GAB_6407_FAILED_TRAN(DateTimeOccur DATETIME, Job VARCHAR(20), Suffix VARCHAR(30), Sequence VARCHAR(10), DateTransaction DATE, Workcenter VARCHAR(6), Employee VARCHAR(5), StartTime DATETIME, EndTime DATETIME, HoursWorked DOUBLE, Closed VARCHAR(1), GoodPieces BIGINT, BadPieces BIGINT, ScrapCode VARCHAR(255), ErrorMessage VARCHAR(850));")
+		F.ODBC.Connection!PSQL_con.Execute("CREATE TABLE GAB_6407_FAILED_TRAN(DateTimeOccur DATETIME, Line BIGINT, Job VARCHAR(20), Suffix VARCHAR(30), Sequence VARCHAR(10), DateTransaction DATE, Workcenter VARCHAR(6), Employee VARCHAR(5), StartTime VARCHAR(23), EndTime VARCHAR(23), HoursWorked DOUBLE, Closed VARCHAR(1), GoodPieces BIGINT, BadPieces BIGINT, ScrapCode VARCHAR(255), ErrorMessage VARCHAR(850));")
+	F.Intrinsic.Control.EndIf
+	
+	F.ODBC.Connection!PSQL_con.TableExists("GAB_6407_FAILED_ORI",V.Local.bTableExists)
+	F.Intrinsic.Control.If(V.Local.bTableExists.Not)
+		F.ODBC.Connection!PSQL_con.Execute("CREATE TABLE GAB_6407_FAILED_ORI(DateTimeOccur DATETIME, Line BIGINT, Job VARCHAR(20), Suffix VARCHAR(30), Sequence VARCHAR(10), DateTransaction DATE, Workcenter VARCHAR(6), Employee VARCHAR(5), StartTime VARCHAR(23), EndTime VARCHAR(23), HoursWorked DOUBLE, Closed VARCHAR(1), GoodPieces BIGINT, BadPieces BIGINT, ScrapCode VARCHAR(255), ErrorMessage VARCHAR(850));")
+	F.Intrinsic.Control.EndIf
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Left(v.Ambient.ErrorDescription.Trim,850,V.Global.sErrorDescription)
+	F.Intrinsic.String.Build("Insert into GAB_6407_Error (DateTimeOccur,Description) values (Now(),'{0} Sub: {1} {2}')",v.Ambient.ErrorNumber,v.Ambient.CurrentSubroutine,V.Global.sErrorDescription.PSQLFriendly,V.Global.sSQL)
+	F.ODBC.Connection!PSQL_con.Execute(V.Global.sSQL)
+	F.Intrinsic.Control.CallSub(Unload)
+F.Intrinsic.Control.EndTry
+Program.Sub.CheckCustomTable.End
+
+'Program.Sub.ValidateJob.Start
+'F.Intrinsic.Control.Try
+'	V.Local.bValidJob.Declare
+'	V.Local.bJobClosed.Declare
+'	V.Local.bLaborSeq.Declare
+'	V.Local.bFlagSetup.Declare
+'	V.Local.sQuery.Declare
+'	V.Local.sRet.Declare
+'	
+'	'Validate the Job
+'	F.Intrinsic.String.Build("select JOB, SUFFIX, SEQ, LMO, FLAG_CLOSED, FLAG_SET_UP from JOB_OPERATIONS where JOB = '{0}' AND SUFFIX = '{1}' AND SEQ = '{2}';",V.Args.sJob,V.Args.sSuffix,V.Args.sSeq,V.Local.sQuery)
+'	F.ODBC.Connection!PSQL_con.ExecuteAndReturn(V.Local.sQuery,V.Local.sRet)
+'	F.Intrinsic.String.Split(V.Local.sRet,"*!*",V.Local.sRet)
+'	F.Intrinsic.Control.If(V.Local.sRet(0).Trim,=,"")
+'		V.Local.bValidJob.Set(False)
+'	F.Intrinsic.Control.Else
+'		V.Local.bValidJob.Set(True)
+'	F.Intrinsic.Control.EndIf
+'	
+'	F.Intrinsic.Control.If(V.Local.sRet(3).Trim,=,"L")
+'		V.Local.bLaborSeq.Set(True)
+'	F.Intrinsic.Control.Else
+'		V.Local.bLaborSeq.Set(False)
+'	F.Intrinsic.Control.EndIf
+'	
+'	F.Intrinsic.Control.If(V.Local.sRet(4).Trim,=,"Y")
+'		V.Local.bJobClosed.Set(True)
+'	F.Intrinsic.Control.Else
+'		V.Local.bJobClosed.Set(False)
+'	F.Intrinsic.Control.EndIf
+'	
+'	F.Intrinsic.Control.If(V.Local.sRet(5).Trim,=,"Y")
+'		V.Local.bFlagSetup.Set(True)
+'	F.Intrinsic.Control.Else
+'		V.Local.bFlagSetup.Set(False)
+'	F.Intrinsic.Control.EndIf
+'	
+'	F.Intrinsic.Variable.AddRV("bValidJob",V.Local.bValidJob,"bLaborSeq",V.Local.bLaborSeq,"bJobClosed",V.Local.bJobClosed,"bFlagsetup",V.Local.bFlagSetup)
+
+'F.Intrinsic.Control.Catch
+'	F.Intrinsic.String.Left(v.Ambient.ErrorDescription.Trim,850,V.Global.sErrorDescription)
+'	F.Intrinsic.String.Build("Insert into GAB_6407_Error (DateTimeOccur,Description) values (Now(),'{0} Sub: {1} {2}')",v.Ambient.ErrorNumber,v.Ambient.CurrentSubroutine,V.Global.sErrorDescription.PSQLFriendly,V.Global.sSQL)
+'	F.ODBC.Connection!PSQL_con.Execute(V.Global.sSQL)
+'	F.Intrinsic.Control.CallSub(Unload)
+'F.Intrinsic.Control.EndTry
+'Program.Sub.ValidateJob.End
+
+'Program.Sub.ValidateDate.Start
+'F.Intrinsic.Control.Try
+'	V.Local.bValidDate.Declare
+'	V.Local.sDateCC.Declare
+'	V.Local.sDateYY.Declare
+'	V.Local.sDateMM.Declare
+'	V.Local.sDateDD.Declare
+'	V.Local.sDate.Declare
+'	
+'	F.Intrinsic.Control.SelectCase(V.Args.sDateInputFormat)
+'		F.Intrinsic.Control.Case("YYYYMMDD")
+'			F.Intrinsic.String.Left(V.Args.sDateInput,2,V.Local.sDateCC)
+'			F.Intrinsic.String.Mid(V.Args.sDateInput,3,2,V.Local.sDateYY)
+'			F.Intrinsic.String.Mid(V.Args.sDateInput,5,2,V.Local.sDateMM)
+'			F.Intrinsic.String.Right(V.Args.sDateInput,2,V.Local.sDateDD)			
+'	F.Intrinsic.Control.EndSelect
+'	
+'	V.Local.bValidDate.Set(False)
+'	
+'	'Validate whether it is a valid date
+'	'Set the format of the date to MM/DD/YYYY
+'	F.Intrinsic.String.Concat(V.Local.sDateMM,"/",V.Local.sDateDD,"/",V.Local.sDateCC,V.Local.sDateYY,V.Local.sDate)
+'	F.Intrinsic.Date.IsDate(V.Local.sDate,V.Local.bValidDate)
+'	F.Intrinsic.Control.If(V.Local.bValidDate.Not)
+'		F.Intrinsic.String.Concat(V.Local.sDateDD,"/",V.Local.sDateMM,"/",V.Local.sDateCC,V.Local.sDateYY,V.Local.sDate)
+'		F.Intrinsic.Date.IsDate(V.Local.sDate,V.Local.bValidDate)
+'		F.Intrinsic.Control.If(V.Local.bValidDate.Not)
+'			'Invalid Date
+'			F.Intrinsic.Variable.AddRV("bValidDate",V.Local.bValidDate,"sRetDate","")
+'			F.Intrinsic.Control.ExitSub
+'		F.Intrinsic.Control.EndIf
+'	F.Intrinsic.Control.EndIf
+'	
+'	F.Intrinsic.Control.If(V.Local.bValidDate)
+'		F.Intrinsic.Control.SelectCase(V.Args.sDateOutputFormat)
+'			F.Intrinsic.Control.Case("MMDDYY")
+'				F.Intrinsic.String.Concat(V.Local.sDateMM,V.Local.sDateDD,V.Local.sDateYY,V.Local.sDate)
+'			F.Intrinsic.Control.Case("YYMMDD")
+'				F.Intrinsic.String.Concat(V.Local.sDateYY,V.Local.sDateMM,V.Local.sDateDD,V.Local.sDate)
+'			F.Intrinsic.Control.Case("YYYYMMDD")
+'				F.Intrinsic.String.Concat(V.Local.sDateCC,V.Local.sDateYY,V.Local.sDateMM,V.Local.sDateDD,V.Local.sDate)
+'			F.Intrinsic.Control.Case("CCYYMMDD")
+'				F.Intrinsic.String.Concat(V.Local.sDateCC,V.Local.sDateYY,V.Local.sDateMM,V.Local.sDateDD,V.Local.sDate)
+'		F.Intrinsic.Control.EndSelect
+'		F.Intrinsic.Variable.AddRV("bValidDate",V.Local.bValidDate,"sRetDate",V.Local.sDate)
+'	F.Intrinsic.Control.EndIf
+
+'F.Intrinsic.Control.Catch
+'	F.Intrinsic.String.Left(v.Ambient.ErrorDescription.Trim,850,V.Global.sErrorDescription)
+'	F.Intrinsic.String.Build("Insert into GAB_6407_Error (DateTimeOccur,Description) values (Now(),'{0} Sub: {1} {2}')",v.Ambient.ErrorNumber,v.Ambient.CurrentSubroutine,V.Global.sErrorDescription.PSQLFriendly,V.Global.sSQL)
+'	F.ODBC.Connection!PSQL_con.Execute(V.Global.sSQL)
+'	F.Intrinsic.Control.CallSub(Unload)
+'F.Intrinsic.Control.EndTry
+'Program.Sub.ValidateDate.End
+
+'Program.Sub.ValidateWorkcenter.Start
+'F.Intrinsic.Control.Try
+'	V.Local.bValid.Declare
+'	V.Local.sQuery.Declare
+'	V.Local.sRet.Declare
+'	
+'	'Validate that the Workcenter
+'	F.Intrinsic.String.Build("SELECT MACHINE FROM WORKCENTERS WHERE MACHINE = '{0}';",V.Args.sWorkcenter,V.Local.sQuery)
+'	F.ODBC.Connection!PSQL_con.ExecuteAndReturn(V.Local.sQuery,V.Local.sRet)
+'	F.Intrinsic.Control.If(V.Local.sRet,=,"")
+'		V.Local.bValid.Set(False)
+'	F.Intrinsic.Control.Else
+'		V.Local.bValid.Set(True)
+'	F.Intrinsic.Control.EndIf
+'	
+'	F.Intrinsic.Variable.AddRV("bValid",V.Local.bValid)
+
+'F.Intrinsic.Control.Catch
+'	F.Intrinsic.String.Left(v.Ambient.ErrorDescription.Trim,850,V.Global.sErrorDescription)
+'	F.Intrinsic.String.Build("Insert into GAB_6407_Error (DateTimeOccur,Description) values (Now(),'{0} Sub: {1} {2}')",v.Ambient.ErrorNumber,v.Ambient.CurrentSubroutine,V.Global.sErrorDescription.PSQLFriendly,V.Global.sSQL)
+'	F.ODBC.Connection!PSQL_con.Execute(V.Global.sSQL)
+'	F.Intrinsic.Control.CallSub(Unload)
+'F.Intrinsic.Control.EndTry
+'Program.Sub.ValidateWorkcenter.End
+
+'Program.Sub.ValidateEmployee.Start
+'F.Intrinsic.Control.Try
+'	V.Local.bValid.Declare
+'	V.Local.sQuery.Declare
+'	V.Local.sRet.Declare
+'	
+'	'Validate the employee and that the employee has a rate
+'	F.Intrinsic.String.Build("SELECT EMPLOYEE FROM EMPLOYEE_MSTR WHERE EMPLOYEE = '{0}';",V.Args.sEmployee,V.Local.sQuery)
+'	F.ODBC.Connection!PSQL_con.ExecuteAndReturn(V.Local.sQuery,V.Local.sRet)
+'	F.Intrinsic.Control.If(V.Local.sRet,=,"")
+'		V.Local.bValid.Set(False)
+'	F.Intrinsic.Control.Else
+'		V.Local.bValid.Set(True)
+'	F.Intrinsic.Control.EndIf
+'	
+'	F.Intrinsic.Variable.AddRV("bValid",V.Local.bValid)
+'	
+'F.Intrinsic.Control.Catch
+'	F.Intrinsic.String.Left(v.Ambient.ErrorDescription.Trim,850,V.Global.sErrorDescription)
+'	F.Intrinsic.String.Build("Insert into GAB_6407_Error (DateTimeOccur,Description) values (Now(),'{0} Sub: {1} {2}')",v.Ambient.ErrorNumber,v.Ambient.CurrentSubroutine,V.Global.sErrorDescription.PSQLFriendly,V.Global.sSQL)
+'	F.ODBC.Connection!PSQL_con.Execute(V.Global.sSQL)
+'	F.Intrinsic.Control.CallSub(Unload)
+'F.Intrinsic.Control.EndTry
+'Program.Sub.ValidateEmployee.End
+
+'Program.Sub.ValidateTime.Start
+'F.Intrinsic.Control.Try
+'	V.Local.bValid.Declare
+'	V.Local.sQuery.Declare
+'	V.Local.sRet.Declare
+'	V.Local.sTimeHH.Declare
+'	V.Local.sTimeMM.Declare
+'	V.Local.sTime.Declare
+'	
+'	'Make the time to be 4 char long (Left Pad with ZERO)
+'	F.Intrinsic.String.LPad(V.Args.sTime,"0",4,V.Local.sTime)
+'	
+'	'Validate the Time
+'	F.Intrinsic.String.Left(V.Local.sTime,2,V.Local.sTimeHH)
+'	F.Intrinsic.String.Mid(V.Local.sTime,3,2,V.Local.sTimeMM)
+'	
+'	'Check whether the Time is numeric
+'	F.Intrinsic.Math.IsNumeric(V.Local.sTimeHH,V.Local.bValid)
+'	F.Intrinsic.Control.If(V.Local.bValid.Not)
+'		'Invalid Time
+'		F.Intrinsic.Variable.AddRV("bValid",V.Local.bValid)
+'		F.Intrinsic.Control.ExitSub
+'	F.Intrinsic.Control.Else
+'		F.Intrinsic.Control.If(V.Local.sTimeHH.Long,<,0,"OR",V.Local.sTimeHH,>,23)
+'			'Invalid Time
+'			F.Intrinsic.Variable.AddRV("bValid",False)
+'			F.Intrinsic.Control.ExitSub
+'		F.Intrinsic.Control.EndIf
+'	F.Intrinsic.Control.EndIf
+'	
+'	F.Intrinsic.Math.IsNumeric(V.Local.sTimeMM,V.Local.bValid)
+'	F.Intrinsic.Control.If(V.Local.bValid.Not)
+'		'Invalid Time
+'		F.Intrinsic.Variable.AddRV("bValid",V.Local.bValid)
+'		F.Intrinsic.Control.ExitSub
+'	F.Intrinsic.Control.Else
+'		F.Intrinsic.Control.If(V.Local.sTimeMM.Long,<,0,"OR",V.Local.sTimeMM,>,59)
+'			'Invalid Time
+'			F.Intrinsic.Variable.AddRV("bValid",False)
+'			F.Intrinsic.Control.ExitSub
+'		F.Intrinsic.Control.EndIf
+'	F.Intrinsic.Control.EndIf
+'	
+'	'If it reaches here then it is a valid Time
+'	F.Intrinsic.Variable.AddRV("bValid",True)
+
+'F.Intrinsic.Control.Catch
+'	F.Intrinsic.String.Left(v.Ambient.ErrorDescription.Trim,850,V.Global.sErrorDescription)
+'	F.Intrinsic.String.Build("Insert into GAB_6407_Error (DateTimeOccur,Description) values (Now(),'{0} Sub: {1} {2}')",v.Ambient.ErrorNumber,v.Ambient.CurrentSubroutine,V.Global.sErrorDescription.PSQLFriendly,V.Global.sSQL)
+'	F.ODBC.Connection!PSQL_con.Execute(V.Global.sSQL)
+'	F.Intrinsic.Control.CallSub(Unload)
+'F.Intrinsic.Control.EndTry
+'Program.Sub.ValidateTime.End
+
+'Program.Sub.ValidateQty.Start
+'F.Intrinsic.Control.Try
+'	V.Local.bValid.Declare
+'	
+'	'Check whether the Qty is numeric
+'	F.Intrinsic.Math.IsNumeric(V.Args.sQty,V.Local.bValid)
+'	F.Intrinsic.Control.If(V.Local.bValid.Not)
+'		'Invalid Qty
+'		F.Intrinsic.Variable.AddRV("bValid",V.Local.bValid)
+'		F.Intrinsic.Control.ExitSub
+'	F.Intrinsic.Control.EndIf
+'	
+'	'If it reaches here then it is a valid Time
+'	F.Intrinsic.Variable.AddRV("bValid",True)
+
+'F.Intrinsic.Control.Catch
+'	F.Intrinsic.String.Left(v.Ambient.ErrorDescription.Trim,850,V.Global.sErrorDescription)
+'	F.Intrinsic.String.Build("Insert into GAB_6407_Error (DateTimeOccur,Description) values (Now(),'{0} Sub: {1} {2}')",v.Ambient.ErrorNumber,v.Ambient.CurrentSubroutine,V.Global.sErrorDescription.PSQLFriendly,V.Global.sSQL)
+'	F.ODBC.Connection!PSQL_con.Execute(V.Global.sSQL)
+'	F.Intrinsic.Control.CallSub(Unload)
+'F.Intrinsic.Control.EndTry
+'Program.Sub.ValidateQty.End
+
+Program.Sub.Comments.Start
+${$5$}$3.0.0.0$}$1
+${$6$}$tdjohan$}$20210826151749158$}$8rAQhOSvlohpQhMDm1j544LwmwXnRbkh8RLTlTX4JIGbY8keEmOXh2vwkdlL7U73L0oZNt/iJO8=
+Program.Sub.Comments.End
