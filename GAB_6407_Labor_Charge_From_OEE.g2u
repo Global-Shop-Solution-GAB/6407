@@ -1,0 +1,1164 @@
+﻿Program.Sub.ScreenSU.Start
+Gui.frmMain..Create(BaseForm)
+Gui.frmMain..Caption("Labor Charge from OEE (6407)")
+Gui.frmMain..Size(828,491)
+Gui.frmMain..MinX(0)
+Gui.frmMain..MinY(0)
+Gui.frmMain..Position(0,0)
+Gui.frmMain..AlwaysOnTop(False)
+Gui.frmMain..FontName("Tahoma")
+Gui.frmMain..FontSize(8.25)
+Gui.frmMain..ControlBox(True)
+Gui.frmMain..MaxButton(True)
+Gui.frmMain..MinButton(True)
+Gui.frmMain..MousePointer(0)
+Gui.frmMain..Moveable(True)
+Gui.frmMain..Sizeable(True)
+Gui.frmMain..ShowInTaskBar(True)
+Gui.frmMain..TitleBar(True)
+Gui.frmMain..Event(UnLoad,UnLoad)
+Gui.frmMain.spcDisplay.Create(SplitContainer)
+Gui.frmMain.spcDisplay.Enabled(True)
+Gui.frmMain.spcDisplay.Visible(True)
+Gui.frmMain.spcDisplay.Zorder(0)
+Gui.frmMain.spcDisplay.Size(819,395)
+Gui.frmMain.spcDisplay.Position(4,62)
+Gui.frmMain.spcDisplay.Orientation(1)
+Gui.frmMain.spcDisplay.SplitterPosition(139)
+Gui.frmMain.spcDisplay.Collapsed(False)
+Gui.frmMain.spcDisplay.Anchor(15)
+Gui.frmMain.gsgcDetail.Create(GsGridControl)
+Gui.frmMain.gsgcDetail.Enabled(True)
+Gui.frmMain.gsgcDetail.Visible(True)
+Gui.frmMain.gsgcDetail.Zorder(0)
+Gui.frmMain.gsgcDetail.Size(819,244)
+Gui.frmMain.gsgcDetail.Position(0,0)
+Gui.frmMain.gsgcDetail.Parent("spcDisplay",1)
+Gui.frmMain.gsgcDetail.Anchor(15)
+Gui.frmMain.gsgcDetail.Dock(5)
+Gui.frmMain.gsgcDetail.Event(RowCellClick,gsgcDetail_RowCellClick)
+Gui.frmMain.gsgcDetail.Event(CellValueChanged,gsgcDetail_CellValueChanged)
+Gui.frmMain.gsgcDetail.Event(MouseDown,gsgcDetail_MouseDown)
+Gui.frmMain.gsgcDetail.Event(KeyPress,gsgcDetail_KeyPress)
+Gui.frmMain.gsgcSummary.Create(GsGridControl)
+Gui.frmMain.gsgcSummary.Enabled(True)
+Gui.frmMain.gsgcSummary.Visible(True)
+Gui.frmMain.gsgcSummary.Zorder(0)
+Gui.frmMain.gsgcSummary.Size(819,139)
+Gui.frmMain.gsgcSummary.Position(0,0)
+Gui.frmMain.gsgcSummary.Parent("spcDisplay",0)
+Gui.frmMain.gsgcSummary.Anchor(15)
+Gui.frmMain.gsgcSummary.Dock(5)
+Gui.frmMain.gsgcSummary.Event(RowCellClick,gsgcSummary_RowCellClick)
+Gui.frmMain.pbDisplay.Create(ProgressBar)
+Gui.frmMain.pbDisplay.Visible(False)
+Gui.frmMain.pbDisplay.Size(317,18)
+Gui.frmMain.pbDisplay.Position(500,18)
+Gui.frmMain.pbDisplay.Scrolling(True)
+Gui.frmMain.pbDisplay.Anchor(8)
+Gui.frmMain.frame1.Create(Frame)
+Gui.frmMain.frame1.Enabled(True)
+Gui.frmMain.frame1.Visible(True)
+Gui.frmMain.frame1.Zorder(0)
+Gui.frmMain.frame1.Size(271,54)
+Gui.frmMain.frame1.Position(216,4)
+Gui.frmMain.frame1.Caption("")
+Gui.frmMain.frame1.FontName("Tahoma")
+Gui.frmMain.frame1.FontSize(8.25)
+Gui.frmMain.pbProcess.Create(ProgressBar)
+Gui.frmMain.pbProcess.Visible(False)
+Gui.frmMain.pbProcess.Size(260,13)
+Gui.frmMain.pbProcess.Position(4,3)
+Gui.frmMain.pbProcess.Parent("frame1")
+Gui.frmMain.lblProcess.Create(Label,"Step 1: Processing Record 0 of 0",False,258,13,0,4,21,True,0,"Tahoma",8.25,,0,1)
+Gui.frmMain.lblProcess.BorderStyle(0)
+Gui.frmMain.lblProcess.Parent("frame1")
+Gui.frmMain.lblUpload.Create(Label,"Step 2: Uploading 0 Recods. Please wait........",False,259,13,0,5,36,True,0,"Tahoma",8.25,,0,1)
+Gui.frmMain.lblUpload.BorderStyle(0)
+Gui.frmMain.lblUpload.Parent("frame1")
+Gui.frmMain.cmdRefresh.Create(Button)
+Gui.frmMain.cmdRefresh.Enabled(True)
+Gui.frmMain.cmdRefresh.Visible(True)
+Gui.frmMain.cmdRefresh.Zorder(0)
+Gui.frmMain.cmdRefresh.Size(63,50)
+Gui.frmMain.cmdRefresh.Position(137,5)
+Gui.frmMain.cmdRefresh.Caption("Refresh")
+Gui.frmMain.cmdRefresh.FontName("Tahoma")
+Gui.frmMain.cmdRefresh.FontSize(8.25)
+Gui.frmMain.cmdRefresh.ToolTip("Refresh")
+Gui.frmMain.cmdRefresh.Event(Click,cmdRefresh_Click)
+Gui.frmMain.dtpLastEndTimeFrom.Create(DatePicker)
+Gui.frmMain.dtpLastEndTimeFrom.Enabled(True)
+Gui.frmMain.dtpLastEndTimeFrom.Visible(True)
+Gui.frmMain.dtpLastEndTimeFrom.Zorder(0)
+Gui.frmMain.dtpLastEndTimeFrom.Size(80,20)
+Gui.frmMain.dtpLastEndTimeFrom.Position(45,7)
+Gui.frmMain.dtpLastEndTimeFrom.CheckBox(False)
+Gui.frmMain.dtpLastEndTimeFrom.FontName("Tahoma")
+Gui.frmMain.dtpLastEndTimeFrom.FontSize(8.25)
+Gui.frmMain.dtpLastEndTimeTo.Create(DatePicker)
+Gui.frmMain.dtpLastEndTimeTo.Enabled(True)
+Gui.frmMain.dtpLastEndTimeTo.Visible(True)
+Gui.frmMain.dtpLastEndTimeTo.Zorder(0)
+Gui.frmMain.dtpLastEndTimeTo.Size(80,20)
+Gui.frmMain.dtpLastEndTimeTo.Position(45,32)
+Gui.frmMain.dtpLastEndTimeTo.CheckBox(False)
+Gui.frmMain.dtpLastEndTimeTo.Value(7/12/2022 11:07:53 AM)
+Gui.frmMain.dtpLastEndTimeTo.FontName("Tahoma")
+Gui.frmMain.dtpLastEndTimeTo.FontSize(8.25)
+Gui.frmMain.lblLastStartTimeFrom.Create(Label,"From",True,24,13,0,15,11,True,10,"Tahoma",8.25,,0,0)
+Gui.frmMain.lblLastStartTimeFrom.BorderStyle(0)
+Gui.frmMain.lblLastStartTimeTo.Create(Label,"To",True,24,13,0,15,35,True,10,"Tahoma",8.25,,0,1)
+Gui.frmMain.lblLastStartTimeTo.BorderStyle(0)
+Program.Sub.ScreenSU.End
+
+Program.Sub.Preflight.Start
+V.Global.sError.Declare(String)
+V.Global.bFileUploaded.Declare(Boolean)
+V.Global.sJob.Declare(String)
+V.Global.sSequence.Declare(String)
+V.Global.sWorkcenter.Declare(String)
+V.Global.sEmployee.Declare(String)
+V.Global.sStartTime.Declare(String)
+V.Global.sEndTime.Declare(String)
+V.Global.sClosed.Declare(String)
+V.Global.iGoodPieces.Declare(Long)
+V.Global.iBadPieces.Declare(Long)
+'V.Global.sScrapCode.Declare(String)
+V.Global.iRowIndex.Declare(Long,-1)
+Program.External.Include.Library("GAB_6407_Common.lib",False)
+
+'Used in GAB_6407_COMMON.lib
+V.Global.sString.Declare(String)
+V.Global.sLastStartTime.Declare(String)
+V.Global.sLastEndTime.Declare(String)
+V.Global.sCallerPgrm.Declare(String)
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+F.Intrinsic.Control.Try
+	v.Local.dDate.Declare
+
+	Function.Intrinsic.UI.UsePixels ' Allows you to use Pixels instead of Twips throughout
+	
+	'Prevent the form from using DarkTheme
+	F.Intrinsic.Task.SetEnvironmentVariable("USEDARKTHEME",False)
+	gui.frmMain..ApplyTheme()
+	
+	gui.frmMain.gsgcSummary.Visible(False)
+	gui.frmMain.gsgcDetail.Visible(False)
+	gui.frmMain..Show
+'	gui.frmMain.pbDisplay.Visible(True)
+	gui.frmMain.frame1.Visible(False)
+	
+	F.ODBC.Connection!PSQL_con.OpenCompanyConnection(240)
+	
+	F.Intrinsic.Control.CallSub(CheckCustomTable)
+	
+'	F.Intrinsic.Control.CallSub(LoadSummaryData)
+	'Set To Date
+	gui.frmMain.dtpLastEndTimeTo.Value(v.Ambient.Date)
+	'Set From Date
+	F.Intrinsic.Date.DateAdd("D",-7,v.Ambient.Date,v.Local.dDate)
+	gui.frmMain.dtpLastEndTimeFrom.Value(v.Local.dDate)
+	
+'	gui.frmMain.pbDisplay.Visible(False)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Global.sError)
+	F.Intrinsic.UI.Msgbox(V.Global.sError)
+	F.Intrinsic.Control.CallSub(Unload)
+F.Intrinsic.Control.EndTry
+Program.Sub.Main.End
+
+Program.Sub.UnLoad.Start
+F.Intrinsic.Control.Try
+	
+	F.Intrinsic.Control.If(V.DataTable.dtDetail.Exists)
+		F.Data.DataView.Close("dtDetail","dvDetail")
+		F.Data.DataTable.Close("dtDetail")
+	F.Intrinsic.Control.EndIf
+	
+	F.Intrinsic.Control.If(V.DataTable.dtSummary.Exists)
+		F.Data.DataView.Close("dtSummary","dvSummary")
+		F.Data.DataTable.Close("dtSummary")
+	F.Intrinsic.Control.EndIf
+	
+	F.Intrinsic.Control.If(V.DataTable.dtOEE.Exists)
+		F.Data.DataTable.Close("dtOEE")
+	F.Intrinsic.Control.EndIf
+	
+	F.Intrinsic.Control.If(V.ODBC.PSQL_con.State,=,1)
+		F.ODBC.Connection!PSQL_con.Close
+	F.Intrinsic.Control.EndIf
+	
+	F.Intrinsic.Control.End
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Global.sError)
+	F.Intrinsic.UI.Msgbox(V.Global.sError)
+	F.Intrinsic.Control.End
+F.Intrinsic.Control.EndTry
+Program.Sub.UnLoad.End
+
+Program.Sub.CheckCustomTable.Start
+F.Intrinsic.Control.Try
+
+	V.Local.bTableExists.Declare
+	V.Local.sMessage.Declare
+	
+	F.ODBC.Connection!PSQL_con.TableExists("GAB_6407_LAST_TRAN",V.Local.bTableExists)
+	F.Intrinsic.Control.If(V.Local.bTableExists.Not)
+		F.Intrinsic.String.Build("GAB_6407_LAST_TRAN table does not exist.{0}Please create it by running Online Update once.",V.Ambient.NewLine,V.Local.sMessage)
+		F.Intrinsic.UI.Msgbox(V.Local.sMessage,"Labor Charge from OEE (6407)")
+		F.Intrinsic.Control.CallSub(Unload)
+	F.Intrinsic.Control.EndIf
+	
+	F.ODBC.Connection!PSQL_con.TableExists("GAB_6407_FAILED_TRAN",V.Local.bTableExists)
+	F.Intrinsic.Control.If(V.Local.bTableExists.Not)
+		F.Intrinsic.String.Build("GAB_6407_FAILED_TRAN table does not exist.{0}Please create it by running Online Update once.",V.Ambient.NewLine,V.Local.sMessage)
+		F.Intrinsic.UI.Msgbox(V.Local.sMessage,"Labor Charge from OEE (6407)")
+		F.Intrinsic.Control.CallSub(Unload)
+	F.Intrinsic.Control.EndIf
+	
+	F.ODBC.Connection!PSQL_con.TableExists("GAB_6407_FAILED_ORI",V.Local.bTableExists)
+	F.Intrinsic.Control.If(V.Local.bTableExists.Not)
+		F.Intrinsic.String.Build("GAB_6407_FAILED_ORI table does not exist.{0}Please create it by running Online Update once.",V.Ambient.NewLine,V.Local.sMessage)
+		F.Intrinsic.UI.Msgbox(V.Local.sMessage,"Labor Charge from OEE (6407)")
+		F.Intrinsic.Control.CallSub(Unload)
+	F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Global.sError)
+	F.Intrinsic.UI.Msgbox(V.Global.sError)
+	F.Intrinsic.Control.CallSub(Unload)
+F.Intrinsic.Control.EndTry
+Program.Sub.CheckCustomTable.End
+
+Program.Sub.LoadSummaryData.Start
+F.Intrinsic.Control.Try
+
+	V.Local.sQuery.Declare
+	V.Local.sLastEndTimeFrom.Declare
+	V.Local.sLastEndTimeTo.Declare
+	
+	F.Intrinsic.String.Format(v.Screen.frmMain!dtpLastEndTimeFrom.Value,"yyyy-mm-dd 00:00:00.000",V.Local.sLastEndTimeFrom)
+	F.Intrinsic.String.Format(v.Screen.frmMain!dtpLastEndTimeTo.Value,"yyyy-mm-dd 23:59:59.999",V.Local.sLastEndTimeTo)
+	
+'	V.Local.sQuery.Set("SELECT CONVERT(A.DateTimeOccur,SQL_VARCHAR) As DateTimeOccur, CONVERT(A.LastEndTime,SQL_VARCHAR) As LastEndTime, A.GS_User, COUNT(B.LINE) As TotalRec FROM GAB_6407_LAST_TRAN A LEFT JOIN GAB_6407_FAILED_TRAN B ON A.DateTimeOccur = B.DateTimeOccur GROUP BY A.DateTimeOccur, A.LastEndTime, A.GS_User HAVING TotalRec > 0 ORDER BY A.DateTimeOccur;")
+'	V.Local.sQuery.Set("SELECT CONVERT(A.DateTimeOccur,SQL_VARCHAR) As DateTimeOccur, CONVERT(A.LastEndTime,SQL_VARCHAR) As LastEndTime, A.GS_User, COUNT(B.LINE) As TotalRec FROM GAB_6407_LAST_TRAN A LEFT JOIN GAB_6407_FAILED_TRAN B ON A.DateTimeOccur = B.DateTimeOccur GROUP BY A.DateTimeOccur, A.LastEndTime, A.GS_User ORDER BY A.DateTimeOccur;")
+	f.Intrinsic.String.Build("SELECT CONVERT(A.DateTimeOccur,SQL_VARCHAR) As DateTimeOccur, CONVERT(A.LastEndTime,SQL_VARCHAR) As LastEndTime, A.GS_User, COUNT(B.LINE) As TotalRec FROM GAB_6407_LAST_TRAN A LEFT JOIN GAB_6407_FAILED_TRAN B ON A.DateTimeOccur = B.DateTimeOccur where A.LastEndTime between '{0}' and '{1}' GROUP BY A.DateTimeOccur, A.LastEndTime, A.GS_User ORDER BY A.DateTimeOccur;",V.Local.sLastEndTimeFrom,V.Local.sLastEndTimeTo,v.Local.sQuery)
+	F.Data.DataTable.CreateFromSQL("dtSummary","PSQL_con",V.Local.sQuery,True)
+	
+	'Add new Columns
+	F.Data.DataTable.AddColumn("dtSummary","Show","Long")
+	F.Data.DataTable.AddColumn("dtSummary","Restore","Long")
+	F.Data.DataTable.AddColumn("dtSummary","Delete","Long")
+	F.Data.DataTable.AddColumn("dtSummary","Process","Long")
+	
+	F.Intrinsic.Control.CallSub(FormatSummaryData)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Global.sError)
+	F.Intrinsic.UI.Msgbox(V.Global.sError)
+	F.Intrinsic.Control.CallSub(Unload)
+F.Intrinsic.Control.EndTry
+Program.Sub.LoadSummaryData.End
+
+Program.Sub.FormatSummaryData.Start
+F.Intrinsic.Control.Try
+	
+	gui.frmMain.gsgcSummary.Visible(False)
+	gui.frmMain.gsgcSummary.SuspendLayout
+	
+	F.Data.DataView.Create("dtSummary","dvSummary")
+	gui.frmMain.gsgcSummary.DataSource("dtSummary","dvSummary")
+	gui.frmMain.gsgcSummary.AddGridviewFromDataview("gvSummary","dtSummary","dvSummary")
+	
+	gui.frmMain.gsgcSummary.SetGridviewProperty("gvSummary","MultiSelect",False)
+	gui.frmMain.gsgcSummary.SetGridviewProperty("gvSummary","AllowSort",True)
+	gui.frmMain.gsgcSummary.SetGridviewProperty("gvSummary","AllowFilter",True)
+	gui.frmMain.gsgcSummary.SetGridviewProperty("gvSummary","OptionsViewShowGroupPanel",False)
+	gui.frmMain.gsgcSummary.SetGridviewProperty("gvSummary","OptionsViewColumnAutoWidth",False)
+	gui.frmMain.gsgcSummary.SetGridviewProperty("gvSummary","AllowColumnResizing",True)
+	
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Show","ShowCaption",False)
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Restore","ShowCaption",False)
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Delete","ShowCaption",False)
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Process","ShowCaption",False)
+	
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Delete","Fixed","Right")
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Restore","Fixed","Right")
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Process","Fixed","Right")
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Show","Fixed","Right")
+	
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Delete","AllowSize",False)
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Restore","AllowSize",False)
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Process","AllowSize",False)
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Show","AllowSize",False)
+	
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Delete","AllowFilter",False)
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Restore","AllowFilter",False)
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Process","AllowFilter",False)
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Show","AllowFilter",False)
+	
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Show","CellBackColor","LightGray")
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Restore","CellBackColor","LightGray")
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Delete","CellBackColor","LightGray")
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Process","CellBackColor","LightGray")
+	
+	gui.frmMain.gsgcSummary.ColumnEdit("gvSummary","Show","EditorButton","Show")
+	gui.frmMain.gsgcSummary.ColumnEdit("gvSummary","Restore","EditorButton","Restore")
+	gui.frmMain.gsgcSummary.ColumnEdit("gvSummary","Delete","EditorButton","Delete")
+	gui.frmMain.gsgcSummary.ColumnEdit("gvSummary","Process","EditorButton","Process")
+	
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","DateTimeOccur","HeaderFontBold",True)
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","LastEndTime","HeaderFontBold",True)
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","GS_User","HeaderFontBold",True)
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","TotalRec","HeaderFontBold",True)
+	
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","DateTimeOccur","HeaderHAlignment","Center")
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","LastEndTime","HeaderHAlignment","Center")
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","GS_User","HeaderHAlignment","Center")
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","TotalRec","HeaderHAlignment","Center")
+	
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","DateTimeOccur","CellHAlignment","Far")
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","LastEndTime","CellHAlignment","Far")
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","GS_User","CellHAlignment","Left")
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","TotalRec","CellHAlignment","Far")
+	
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","DateTimeOccur","Caption","Trans Date")
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","LastEndTime","Caption","Last End Time Processed")
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","GS_User","Caption","Username")
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","TotalRec","Caption","Failed Record")
+	
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","DateTimeOccur","Width","150")
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","LastEndTime","Width","150")
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","GS_User","Width","80")
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","TotalRec","Width","100")
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Delete","Width","60")
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Show","Width","60")
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Process","Width","60")
+	
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","DateTimeOccur","AllowEdit",False)
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","LastEndTime","AllowEdit",False)
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","GS_User","AllowEdit",False)
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","TotalRec","AllowEdit",False)
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Show","AllowEdit",False)
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Restore","AllowEdit",False)
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Delete","AllowEdit",False)
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Process","AllowEdit",False)
+	
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","TotalRec","DisplayCustomNumeric","n0")
+	
+	gui.frmMain.gsgcSummary.ResumeLayout
+	gui.frmMain.gsgcSummary.Visible(True)
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Global.sError)
+	F.Intrinsic.UI.Msgbox(V.Global.sError)
+	F.Intrinsic.Control.CallSub(Unload)
+F.Intrinsic.Control.EndTry
+Program.Sub.FormatSummaryData.End
+
+Program.Sub.gsgcSummary_RowCellClick.Start
+F.Intrinsic.Control.Try
+	
+	V.Local.sDateTimeOccur.Declare
+	V.Local.sQuery.Declare
+	V.Local.sRet.Declare
+	V.Local.sProcessMsg.Declare
+	V.Local.sFile.Declare
+	V.Local.sMapper.Declare
+	V.Local.sLastStartTime.Declare
+	V.Local.sLastEndTime.Declare
+	V.Local.bFileIsEmpty.Declare
+	V.Local.sFilter.Declare
+	V.Local.sReturnValue.Declare
+	
+	'Disable clicking event on the EditorButton
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Show","AllowEdit",True)
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Restore","AllowEdit",True)
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Delete","AllowEdit",True)
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Process","AllowEdit",True)
+	
+	F.Intrinsic.Control.If(V.Args.Column.UCase,=,"SHOW")
+'		F.Intrinsic.String.Format(V.DataTable.dtSummary(V.Args.RowIndex).DateTimeOccur!FieldVal,"yyyy-mm-dd Hh:Nn:Ss.000",V.Local.sDateTimeOccur)
+		V.Local.sDateTimeOccur.Set(V.DataTable.dtSummary(V.Args.RowIndex).DateTimeOccur!FieldValTrim)
+		F.Intrinsic.Control.CallSub(BackupOriginalData,"sDateTimeOccur",V.Local.sDateTimeOccur)
+		
+		F.Intrinsic.String.Build("SELECT CONVERT(DateTimeOccur,SQL_VARCHAR) As DateTimeOccur, Line, Job, Suffix, Sequence, DateTransaction, Workcenter, Employee, StartTime, EndTime, HoursWorked, Closed, GoodPieces, BadPieces, ScrapCode, ErrorMessage FROM GAB_6407_FAILED_TRAN WHERE DateTimeOccur = '{0}' ORDER BY LINE;",V.Local.sDateTimeOccur,V.Local.sQuery)	
+		F.Intrinsic.Control.If(V.DataTable.dtDetail.Exists)
+			gui.frmMain.gsgcDetail.ClearRows("gvDetail")
+			F.Data.DataView.Close("dtDetail","dvDetail")
+			F.Data.DataTable.Close("dtDetail")
+		F.Intrinsic.Control.EndIf
+		F.Data.DataTable.CreateFromSQL("dtDetail","PSQL_con",V.Local.sQuery,True)
+		
+		'Add new Columns
+		F.Data.DataTable.AddColumn("dtDetail","Restore","Long")
+		F.Data.DataTable.AddColumn("dtDetail","Delete","Long")
+		
+		F.Intrinsic.Control.CallSub(FormatDetailData)
+		
+	F.Intrinsic.Control.ElseIf(V.Args.Column.UCase,=,"DELETE")
+'		F.Intrinsic.String.Format(V.DataTable.dtSummary(V.Args.RowIndex).DateTimeOccur!FieldVal,"yyyy-mm-dd Hh:Nn:Ss.000",V.Local.sDateTimeOccur)
+		V.Local.sDateTimeOccur.Set(V.DataTable.dtSummary(V.Args.RowIndex).DateTimeOccur!FieldValTrim)
+		F.Intrinsic.Control.CallSub(BackupOriginalData,"sDateTimeOccur",V.Local.sDateTimeOccur)
+		
+		F.Intrinsic.String.Build("DELETE FROM GAB_6407_FAILED_TRAN WHERE DateTimeOccur = '{0}'",V.Local.sDateTimeOccur,V.Local.sQuery)
+		F.ODBC.Connection!PSQL_con.Execute(V.Local.sQuery)
+		
+		F.Data.DataTable.SetValue("dtSummary",V.Args.RowIndex,"TotalRec",0)
+		F.Data.DataTable.AcceptChanges("dtSummary")
+		
+		F.Intrinsic.Control.If(V.DataTable.dtDetail.Exists)
+			F.Intrinsic.Control.If(V.DataTable.dtDetail(0).DateTimeOccur!FieldValTrim,=,V.Local.sDateTimeOccur)
+				gui.frmMain.gsgcDetail.ClearRows("gvDetail")
+				F.Data.DataView.Close("dtDetail","dvDetail")
+				F.Data.DataTable.Close("dtDetail")
+			F.Intrinsic.Control.EndIf
+		F.Intrinsic.Control.EndIf
+	
+	F.Intrinsic.Control.ElseIf(V.Args.Column.UCase,=,"RESTORE")	
+		V.Local.sDateTimeOccur.Set(V.DataTable.dtSummary(V.Args.RowIndex).DateTimeOccur!FieldValTrim)
+		F.Intrinsic.String.Build("SELECT COUNT(*) FROM GAB_6407_FAILED_ORI WHERE DateTimeOccur = '{0}';",V.Local.sDateTimeOccur,V.Local.sQuery)
+		F.ODBC.Connection!PSQL_con.ExecuteAndReturn(V.Local.sQuery,V.Local.sRet)
+		F.Intrinsic.Control.If(V.Local.sRet.Long,>,0)
+			F.Intrinsic.String.Build("DELETE FROM GAB_6407_FAILED_TRAN WHERE DateTimeOccur = '{0}';",V.Local.sDateTimeOccur,V.Local.sQuery)
+			F.ODBC.Connection!PSQL_con.Execute(V.Local.sQuery)
+			
+			F.Intrinsic.String.Build("INSERT INTO GAB_6407_FAILED_TRAN SELECT * FROM GAB_6407_FAILED_ORI WHERE DateTimeOccur = '{0}';",V.Local.sDateTimeOccur,V.Local.sQuery)
+			F.ODBC.Connection!PSQL_con.Execute(V.Local.sQuery)
+			
+			F.ODBC.Connection!PSQL_con.Execute("UPDATE GAB_6407_LAST_TRAN SET GS_USER = 'ONLINE';")
+			
+			F.Intrinsic.String.Build("SELECT COUNT(*) FROM GAB_6407_FAILED_TRAN WHERE DateTimeOccur = '{0}';",V.Local.sDateTimeOccur,V.Local.sQuery)
+			F.ODBC.Connection!PSQL_con.ExecuteAndReturn(V.Local.sQuery,V.Local.sRet)
+			
+			F.Data.DataTable.SetValue("dtSummary",V.Args.RowIndex,"GS_USER","ONLINE","TotalRec",V.Local.sRet.Long)
+			F.Data.DataTable.AcceptChanges("dtSummary")
+			
+			F.Intrinsic.String.Build("SELECT CONVERT(DateTimeOccur,SQL_VARCHAR) As DateTimeOccur, Line, Job, Suffix, Sequence, DateTransaction, Workcenter, Employee, StartTime, EndTime, HoursWorked, Closed, GoodPieces, BadPieces, ScrapCode, ErrorMessage FROM GAB_6407_FAILED_TRAN WHERE DateTimeOccur = '{0}' ORDER BY LINE;",V.Local.sDateTimeOccur,V.Local.sQuery)	
+			F.Intrinsic.Control.If(V.DataTable.dtDetail.Exists)
+				gui.frmMain.gsgcDetail.ClearRows("gvDetail")
+				F.Data.DataView.Close("dtDetail","dvDetail")
+				F.Data.DataTable.Close("dtDetail")
+			F.Intrinsic.Control.EndIf
+			F.Data.DataTable.CreateFromSQL("dtDetail","PSQL_con",V.Local.sQuery,True)
+			
+			'Add new Columns
+			F.Data.DataTable.AddColumn("dtDetail","Restore","Long")
+			F.Data.DataTable.AddColumn("dtDetail","Delete","Long")
+			
+			F.Intrinsic.Control.CallSub(FormatDetailData)
+		F.Intrinsic.Control.EndIf
+		
+	F.Intrinsic.Control.ElseIf(V.Args.Column.UCase,=,"PROCESS")	
+		V.Local.sDateTimeOccur.Set(V.DataTable.dtSummary(V.Args.RowIndex).DateTimeOccur!FieldValTrim)
+		F.Intrinsic.Control.CallSub(BackupOriginalData,"sDateTimeOccur",V.Local.sDateTimeOccur)
+		
+'		F.Intrinsic.String.Build("SELECT TOP 500 Job As WorkOrder, Suffix As PartNo, Sequence As Seq, DateTransaction, Workcenter, CAST(Employee AS VARCHAR(5)) AS Employee, CONVERT(VARCHAR,StartTime,121) As StartTime, CONVERT(VARCHAR,EndTime,121) As EndTime, HoursWorked, Closed, GoodPieces, BadPieces, ScrapCode FROM V_OEE WHERE EndTime >= '{0}' ORDER BY EndTime, DateTransaction",V.Local.sLastEndTime,V.Local.sQuery)
+		F.Intrinsic.String.Build("SELECT Job As WorkOrder, Suffix As PartNo, Sequence As Seq, DateTransaction, Workcenter, Employee, StartTime, EndTime, HoursWorked, Closed, GoodPieces, BadPieces, ScrapCode FROM GAB_6407_FAILED_TRAN WHERE DateTimeOccur = '{0}' ORDER BY Line",V.Local.sDateTimeOccur,V.Local.sQuery)
+		'Do not rename the DataTable name because it is used in the GAB_6407_Common.lib
+		F.Data.DataTable.CreateFromSQL("dtOEE","PSQL_con",V.Local.sQuery,True)
+		
+		'Add a temporary columns
+		F.Data.DataTable.AddColumn("dtOEE","Failed","Boolean",False)
+		F.Data.DataTable.AddColumn("dtOEE","ErrorMessage","String","")
+		
+		V.Global.bFileUploaded.Set(False)
+		V.Local.bFileIsEmpty.Set(False)
+		
+		Gui.frmMain.frame1.Visible(True)
+		
+		'Set the Progress Bar
+		Gui.frmMain.pbProcess.Scrolling(False)
+		Gui.frmMain.pbProcess.Max(V.DataTable.dtOEE.RowCount)
+		Gui.frmMain.pbProcess.Value(0)
+		Gui.frmMain.pbProcess.Visible(True)
+		Gui.frmMain.lblProcess.Visible(True)
+		F.Intrinsic.String.Build("Step 1: Processing Record {0} of {1}",0,V.DataTable.dtOEE.RowCount,V.Local.sProcessMsg)
+		Gui.frmMain.lblProcess.Caption(V.Local.sProcessMsg)
+		
+		F.Intrinsic.String.Build("Step 2: Uploading {0} Records. Please wait...",V.DataTable.dtOEE.RowCount,V.Local.sProcessMsg)
+		Gui.frmMain.lblUpload.Caption(V.Local.sProcessMsg)
+		Gui.frmMain.lblUpload.Visible(False)
+		
+		V.Global.sCallerPgrm.Set(V.Caller.User.Trim)
+		F.Intrinsic.Control.CallSub(ProcessData)
+		
+		F.Intrinsic.String.Build("Step 1: Processing Record {0} of {1}. Completed.",V.Screen.frmMain!pbProcess.Value,V.DataTable.dtOEE.RowCount,V.Local.sProcessMsg)
+		Gui.frmMain.lblProcess.Caption(V.Local.sProcessMsg)
+		
+		'Set Progress Bar Upload to Visible
+		Gui.frmMain.pbProcess.Scrolling(True)
+		Gui.frmMain.lblUpload.Visible(True)		
+			
+		F.Intrinsic.Control.If(V.Global.sString.Trim,<>,"")
+			'Save Tab Delimited File and Upload records from tab delimited file into JOBS_IN_PROCESS - Online Update must be running in order for these records to get posted to JOB_DETAIL
+			F.Intrinsic.String.Build("{0}\{1}{2}MOPEN.txt",V.Caller.FilesDir,V.Caller.CompanyCode,V.Caller.Terminal,V.Local.sFile)
+			F.Intrinsic.File.String2File(V.Local.sFile,V.Global.sString)
+			F.Intrinsic.Task.LaunchGSSSync("JB0455","-C",V.Local.sFile)
+			
+			'Set the Flag that the records are uploaded to database
+			V.Global.bFileUploaded.Set(True)
+		F.Intrinsic.Control.Else
+			V.Local.bFileIsEmpty.Set(True)
+		F.Intrinsic.Control.EndIf
+		
+		F.Intrinsic.String.Build("Step 2: Uploading {0} Records. Completed",V.DataTable.dtOEE.RowCount,V.Local.sProcessMsg)
+		Gui.frmMain.lblUpload.Caption(V.Local.sProcessMsg)
+		
+		'Update the Flag_Indirect to 'S' for those Job Sequence that is Setup sequence
+		'Have to do this because JB0455 only support 'D' (Direct) and 'I' (Indirect) Flag
+		F.ODBC.Connection!PSQL_con.Execute("update JOBS_IN_PROCESS set FLAG_INDIRECT = 'S' from JOBS_IN_PROCESS A INNER JOIN JOB_OPERATIONS B ON A.JOB = B.JOB and A.SUFFIX = B.SUFFIX and A.SEQUENCE = B.SEQ AND B.FLAG_SET_UP = 'Y'")
+		
+		'Delete all records with the same DateTimeOccur being processed
+		F.Intrinsic.String.Build("DELETE FROM GAB_6407_FAILED_TRAN WHERE DateTimeOccur = '{0}';",V.Local.sDateTimeOccur,V.Local.sQuery)
+		F.ODBC.Connection!PSQL_con.Execute(V.Local.sQuery)
+		
+		'Save the failed transaction to GAB_6407_FAILED_TRAN table
+		F.Data.DataView.Create("dtOEE","dvFailed",22,"Failed = True","DateTransaction, EndTime")
+		F.Data.DataView.ToDataTable("dtOEE","dvFailed","dtFailed",True)
+		F.Data.DataTable.RemoveColumn("dtFailed","Failed")
+		F.Data.DataTable.AddColumn("dtFailed","DateTimeOccur","Date")
+		F.Data.DataTable.SetValue("dtFailed",-1,"DateTimeOccur",V.Local.sDateTimeOccur)
+		F.Data.DataTable.AddColumn("dtFailed","Line","Long",0)
+		F.Data.DataTable.SetSeries("dtFailed","Line",1,1)
+		F.Data.DataTable.AcceptChanges("dtFailed")
+		
+		V.Local.sMapper.Set("DateTimeOccur@!@DateTimeOccur*!*Line@!@Line*!*WorkOrder@!@Job*!*PartNo@!@Suffix*!*Seq@!@Sequence*!*DateTransaction@!@DateTransaction*!*Workcenter@!@Workcenter*!*Employee@!@Employee*!*StartTime@!@StartTime*!*EndTime@!@EndTime*!*HoursWorked@!@HoursWorked*!*Closed@!@Closed*!*GoodPieces@!@GoodPieces*!*BadPieces@!@BadPieces*!*ScrapCode@!@ScrapCode*!*ErrorMessage@!@ErrorMessage")
+		F.Data.DataTable.SaveToDB("dtFailed","PSQL_con","GAB_6407_FAILED_TRAN","",128,V.Local.sMapper)
+		F.Data.DataTable.Close("dtFailed")
+		F.Data.DataView.Close("dtOEE","dvFailed")
+		
+		'Update GAB_6407_LAST_TRAN
+		F.Intrinsic.String.Build("UPDATE GAB_6407_LAST_TRAN SET GS_USER = '{0}' WHERE DateTimeOccur = '{1}';",V.Caller.User.Trim,V.Local.sDateTimeOccur,V.Local.sQuery)
+		F.ODBC.Connection!PSQL_con.Execute(V.Local.sQuery)
+		
+		'Update the DataTable dtSummary
+		F.Intrinsic.String.Build("SELECT COUNT(*) FROM GAB_6407_FAILED_TRAN WHERE DateTimeOccur = '{0}';",V.Local.sDateTimeOccur,V.Local.sQuery)
+		F.ODBC.Connection!PSQL_con.ExecuteAndReturn(V.Local.sQuery,V.Local.sRet)
+		
+		F.Intrinsic.String.Build("DateTimeOccur = '{0}'",V.Local.sDateTimeOccur,V.Local.sFilter)
+		F.Data.DataTable.Select("dtSummary",V.Local.sFilter,V.Local.sReturnValue)
+		F.Intrinsic.Control.If(V.Local.sReturnValue.Trim,<>,"***NORETURN***")
+			F.Data.DataTable.SetValue("dtSummary",V.Local.sReturnValue.Long,"TotalRec",V.Local.sRet.Long)
+			F.Data.DataTable.AcceptChanges("dtSummary")
+		F.Intrinsic.Control.EndIf
+		
+		'Reload DataTable dtDetail
+		F.Intrinsic.String.Build("SELECT CONVERT(DateTimeOccur,SQL_VARCHAR) As DateTimeOccur, Line, Job, Suffix, Sequence, DateTransaction, Workcenter, Employee, StartTime, EndTime, HoursWorked, Closed, GoodPieces, BadPieces, ScrapCode, ErrorMessage FROM GAB_6407_FAILED_TRAN WHERE DateTimeOccur = '{0}' ORDER BY LINE;",V.Local.sDateTimeOccur,V.Local.sQuery)	
+		F.Intrinsic.Control.If(V.DataTable.dtDetail.Exists)
+			gui.frmMain.gsgcDetail.ClearRows("gvDetail")
+			F.Data.DataView.Close("dtDetail","dvDetail")
+			F.Data.DataTable.Close("dtDetail")
+		F.Intrinsic.Control.EndIf
+		F.Data.DataTable.CreateFromSQL("dtDetail","PSQL_con",V.Local.sQuery,True)
+		
+		'Add new Columns
+		F.Data.DataTable.AddColumn("dtDetail","Restore","Long")
+		F.Data.DataTable.AddColumn("dtDetail","Delete","Long")
+		
+		F.Intrinsic.Control.CallSub(FormatDetailData)
+		
+		'Display status
+		F.Intrinsic.Control.If(V.Global.bFileUploaded)
+			'Do Nothing
+		F.Intrinsic.Control.ElseIf(V.Global.b.FileIsEmpty)
+			F.Intrinsic.String.Build("All transacation records failed validation.{0}None is uploaded.",V.Ambient.NewLine,V.Local.sProcessMsg)
+			F.Intrinsic.UI.Msgbox(V.Local.sProcessMsg,"Labor Charge from OEE (6407)")
+		F.Intrinsic.Control.Else
+			F.Intrinsic.UI.Msgbox("Data is not processed successfully into JOBS_IN_PROCESS table.","Labor Charge from OEE (6407)")
+		F.Intrinsic.Control.EndIf
+		
+		F.Intrinsic.Control.If(V.DataTable.dtOEE.Exists)
+			F.Data.DataTable.Close("dtOEE")
+		F.Intrinsic.Control.EndIf
+		
+		Gui.frmMain.frame1.Visible(False)
+		
+	F.Intrinsic.Control.EndIf
+	
+	'Enable clicking event on the EditorButton
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Show","AllowEdit",False)
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Restore","AllowEdit",False)
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Delete","AllowEdit",False)
+	gui.frmMain.gsgcSummary.SetColumnProperty("gvSummary","Process","AllowEdit",False)
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Global.sError)
+	F.Intrinsic.UI.Msgbox(V.Global.sError)
+	F.Intrinsic.Control.CallSub(Unload)
+F.Intrinsic.Control.EndTry
+Program.Sub.gsgcSummary_RowCellClick.End
+
+Program.Sub.FormatDetailData.Start
+F.Intrinsic.Control.Try
+	
+	gui.frmMain.gsgcDetail.Visible(False)
+	gui.frmMain.gsgcDetail.SuspendLayout
+	
+	F.Data.DataView.Create("dtDetail","dvDetail")
+	gui.frmMain.gsgcDetail.DataSource("dtDetail","dvDetail")
+	gui.frmMain.gsgcDetail.AddGridviewFromDataview("gvDetail","dtDetail","dvDetail")
+	
+	gui.frmMain.gsgcDetail.SetGridviewProperty("gvDetail","MultiSelect",False)
+	gui.frmMain.gsgcDetail.SetGridviewProperty("gvDetail","AllowSort",True)
+	gui.frmMain.gsgcDetail.SetGridviewProperty("gvDetail","AllowFilter",True)
+	gui.frmMain.gsgcDetail.SetGridviewProperty("gvDetail","OptionsViewShowGroupPanel",False)
+	gui.frmMain.gsgcDetail.SetGridviewProperty("gvDetail","OptionsViewColumnAutoWidth",False)
+	gui.frmMain.gsgcDetail.SetGridviewProperty("gvDetail","AllowColumnResizing",True)
+	gui.frmMain.gsgcDetail.SetGridviewProperty("gvDetail","OptionsViewRowAutoHeight",True)
+	gui.frmMain.gsgcDetail.SetGridviewProperty("gvDetail","ColumnPanelRowHeight",50)
+	
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Restore","ShowCaption",False)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Delete","ShowCaption",False)
+	
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Restore","Fixed","Right")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Delete","Fixed","Right")
+	
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Restore","AllowSize",False)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Delete","AllowSize",False)
+	
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Restore","AllowFilter",False)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Delete","AllowFilter",False)
+	
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Restore","CellBackColor","LightGray")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Delete","CellBackColor","LightGray")
+	
+	gui.frmMain.gsgcDetail.ColumnEdit("gvDetail","Restore","EditorButton","Restore")
+	gui.frmMain.gsgcDetail.ColumnEdit("gvDetail","Delete","EditorButton","Delete")
+	
+'	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","DateTimeOccur","Visible",False)
+	
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","DateTimeOccur","HeaderFontBold",True)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Line","HeaderFontBold",True)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Job","HeaderFontBold",True)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Suffix","HeaderFontBold",True)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Sequence","HeaderFontBold",True)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","DateTransaction","HeaderFontBold",True)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Workcenter","HeaderFontBold",True)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Employee","HeaderFontBold",True)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","StartTime","HeaderFontBold",True)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","EndTime","HeaderFontBold",True)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","HoursWorked","HeaderFontBold",True)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Closed","HeaderFontBold",True)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","GoodPieces","HeaderFontBold",True)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","BadPieces","HeaderFontBold",True)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","ScrapCode","HeaderFontBold",True)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","ErrorMessage","HeaderFontBold",True)
+	
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","DateTimeOccur","HeaderHAlignment","Center")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Line","HeaderHAlignment","Center")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Job","HeaderHAlignment","Center")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Suffix","HeaderHAlignment","Center")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Sequence","HeaderHAlignment","Center")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","DateTransaction","HeaderHAlignment","Center")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Workcenter","HeaderHAlignment","Center")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Employee","HeaderHAlignment","Center")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","StartTime","HeaderHAlignment","Center")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","EndTime","HeaderHAlignment","Center")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","HoursWorked","HeaderHAlignment","Center")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Closed","HeaderHAlignment","Center")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","GoodPieces","HeaderHAlignment","Center")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","BadPieces","HeaderHAlignment","Center")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","ScrapCode","HeaderHAlignment","Center")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","ErrorMessage","HeaderHAlignment","Center")
+	
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","DateTimeOccur","CellHAlignment","Far")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Line","CellHAlignment","Far")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Job","CellHAlignment","Left")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Suffix","CellHAlignment","Left")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Sequence","CellHAlignment","Left")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","DateTransaction","CellHAlignment","Far")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Workcenter","CellHAlignment","Left")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Employee","CellHAlignment","Left")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","StartTime","CellHAlignment","Far")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","EndTime","CellHAlignment","Far")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","HoursWorked","CellHAlignment","Far")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Closed","CellHAlignment","Left")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","GoodPieces","CellHAlignment","Far")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","BadPieces","CellHAlignment","Far")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","ScrapCode","CellHAlignment","Left")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","ErrorMessage","CellHAlignment","Left")
+	
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","DateTimeOccur","Caption","Trans Date")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Line","Caption","Line")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Job","Caption","Work Order (JobNo-JobSuffix)")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Suffix","Caption","Part No")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Sequence","Caption","Sequence")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","DateTransaction","Caption","Date Transaction")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Workcenter","Caption","Workcenter")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Employee","Caption","Employee")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","StartTime","Caption","Start Time (YYYY-MM-DD HH:NN:SS.000)")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","EndTime","Caption","End Time (YYYY-MM-DD HH:NN:SS.000)")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","HoursWorked","Caption","Hours Worked")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Closed","Caption","Flag Closed (Y/N)")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","GoodPieces","Caption","Good Pieces")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","BadPieces","Caption","Bad Pieces")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","ScrapCode","Caption","Scrap Code [(0)ScrapCode1,(0)ScrapCode2]")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","ErrorMessage","Caption","Error Message")
+	
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Job","HeaderWordWrap","Wrap")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","StartTime","HeaderWordWrap","Wrap")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","EndTime","HeaderWordWrap","Wrap")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Closed","HeaderWordWrap","Wrap")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","ScrapCode","HeaderWordWrap","Wrap")
+	
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","DateTimeOccur","Width","150")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Line","Width","50")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Job","Width","100")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Suffix","Width","200")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Sequence","Width","60")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","DateTransaction","Width","80")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Workcenter","Width","60")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Employee","Width","60")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","StartTime","Width","150")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","EndTime","Width","150")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","HoursWorked","Width","80")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Closed","Width","40")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","GoodPieces","Width","80")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","BadPieces","Width","80")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","ScrapCode","Width","150")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","ErrorMessage","Width","300")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Restore","Width","60")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Delete","Width","60")
+	
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","DateTimeOccur","AllowEdit",False)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Line","AllowEdit",False)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Job","AllowEdit",True)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Suffix","AllowEdit",False)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Sequence","AllowEdit",True)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","DateTransaction","AllowEdit",False)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Workcenter","AllowEdit",True)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Employee","AllowEdit",True)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","StartTime","AllowEdit",True)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","EndTime","AllowEdit",True)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","HoursWorked","AllowEdit",False)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Closed","AllowEdit",True)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","GoodPieces","AllowEdit",True)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","BadPieces","AllowEdit",True)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","ScrapCode","AllowEdit",False)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","ErrorMessage","AllowEdit",False)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Restore","AllowEdit",False)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Delete","AllowEdit",False)
+
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Job","ReadOnly",False)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Sequence","ReadOnly",False)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Workcenter","ReadOnly",False)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Employee","ReadOnly",False)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","StartTime","ReadOnly",False)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","EndTime","ReadOnly",False)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Closed","ReadOnly",False)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","GoodPieces","ReadOnly",False)
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","BadPieces","ReadOnly",False)
+'	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","ScrapCode","ReadOnly",False)
+	
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Job","EditMaskType","Regex")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Job","EditMask","[A-Za-z0-9]{0,6}-[A-Za-z0-9]{0,3}")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Job","EditMaskAsDisplayFormat",False)
+	
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Sequence","EditMaskType","Regex")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Sequence","EditMask","[0-9]{0,6}")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Sequence","EditMaskAsDisplayFormat",False)
+	
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Workcenter","EditMaskType","Regex")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Workcenter","EditMask","[0-9A-Z]{0,4}")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Workcenter","EditMaskAsDisplayFormat",False)
+	
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Employee","EditMaskType","Regex")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Employee","EditMask","[0-9]{0,5}")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Employee","EditMaskAsDisplayFormat",False)
+	
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","StartTime","EditMaskType","DateTimeAdvancingCaret")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","StartTime","EditMaskAsDisplayFormat",False)
+	
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","EndTime","EditMaskType","DateTimeAdvancingCaret")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","EndTime","EditMaskAsDisplayFormat",False)
+	
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Closed","EditMaskType","Regex")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Closed","EditMask","[YN]{1}")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Closed","EditMaskAsDisplayFormat",False)
+	
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","GoodPieces","EditMaskType","Numeric")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","GoodPieces","EditMask","###,###,##0")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","GoodPieces","EditMaskAsDisplayFormat",False)
+
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","BadPieces","EditMaskType","Numeric")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","BadPieces","EditMask","###,###,##0")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","BadPieces","EditMaskAsDisplayFormat",False)
+
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Job","CellBackColor","LightYellow")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Sequence","CellBackColor","LightYellow")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Workcenter","CellBackColor","LightYellow")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Employee","CellBackColor","LightYellow")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","StartTime","CellBackColor","LightYellow")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","EndTime","CellBackColor","LightYellow")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Closed","CellBackColor","LightYellow")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","GoodPieces","CellBackColor","LightYellow")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","BadPieces","CellBackColor","LightYellow")
+'	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","ScrapCode","CellBackColor","LightYellow")
+	
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","DateTransaction","DisplayCustomDatetime","d")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","HoursWorked","DisplayCustomNumeric","n2")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","GoodPieces","DisplayCustomNumeric","n0")
+	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","BadPieces","DisplayCustomNumeric","n0")
+	
+	gui.frmMain.gsgcDetail.ResumeLayout
+	gui.frmMain.gsgcDetail.Visible(True)
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Global.sError)
+	F.Intrinsic.UI.Msgbox(V.Global.sError)
+	F.Intrinsic.Control.CallSub(Unload)
+F.Intrinsic.Control.EndTry
+Program.Sub.FormatDetailData.End
+
+Program.Sub.BackupOriginalData.Start
+F.Intrinsic.Control.Try
+	
+	V.Local.sQuery.Declare
+	V.Local.sRet.Declare
+	V.Local.sDatetimeOccur.Declare
+	
+	V.Local.sDatetimeOccur.Set(V.Args.sDateTimeOccur)
+	F.Intrinsic.String.Build("SELECT COUNT(*) FROM GAB_6407_FAILED_ORI WHERE DateTimeOccur = '{0}';",V.Local.sDateTimeOccur,V.Local.sQuery)
+	F.ODBC.Connection!PSQL_con.ExecuteAndReturn(V.Local.sQuery,V.Local.sRet)
+	F.Intrinsic.Control.If(V.Local.sRet.Long,=,0)
+		F.Intrinsic.String.Build("INSERT INTO GAB_6407_FAILED_ORI SELECT * FROM GAB_6407_FAILED_TRAN WHERE DateTimeOccur = '{0}';",V.Local.sDateTimeOccur,V.Local.sQuery)
+		F.ODBC.Connection!PSQL_con.Execute(V.Local.sQuery)
+	F.Intrinsic.Control.EndIf
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Global.sError)
+	F.Intrinsic.UI.Msgbox(V.Global.sError)
+	F.Intrinsic.Control.CallSub(Unload)
+F.Intrinsic.Control.EndTry
+Program.Sub.BackupOriginalData.End
+
+Program.Sub.gsgcDetail_RowCellClick.Start
+F.Intrinsic.Control.Try
+	
+	V.Local.sQuery.Declare
+	V.Local.sDateTimeOccur.Declare
+	V.Local.iLine.Declare
+	V.Local.sRet.Declare
+	V.Local.sFilter.Declare
+	V.Local.sReturnValue.Declare
+	
+'	'Disable Clicking Event on the EditorButton
+'	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Restore","AllowEdit",True)
+'	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Delete","AllowEdit",True)
+
+	F.Intrinsic.Control.If(V.Args.Column.UCase,=,"RESTORE")
+		V.Local.sDateTimeOccur.Set(V.DataTable.dtDetail(V.Args.RowIndex).DateTimeOccur!FieldValTrim)
+		V.Local.iLine.Set(V.DataTable.dtDetail(V.Args.RowIndex).Line!FieldVal)
+		F.Intrinsic.String.Build("SELECT COUNT(*) FROM GAB_6407_FAILED_ORI WHERE DateTimeOccur = '{0}' AND Line = {1};",V.Local.sDateTimeOccur,V.Local.iLine,V.Local.sQuery)
+		F.ODBC.Connection!PSQL_con.ExecuteAndReturn(V.Local.sQuery,V.Local.sRet)
+		F.Intrinsic.Control.If(V.Local.sRet.Long,>,0)
+			F.Intrinsic.String.Build("DELETE FROM GAB_6407_FAILED_TRAN WHERE DateTimeOccur = '{0}' AND Line = {1};",V.Local.sDateTimeOccur,V.Local.iLine,V.Local.sQuery)
+			F.ODBC.Connection!PSQL_con.Execute(V.Local.sQuery)
+			
+			F.Intrinsic.String.Build("INSERT INTO GAB_6407_FAILED_TRAN SELECT * FROM GAB_6407_FAILED_ORI WHERE DateTimeOccur = '{0}' AND Line = {1};",V.Local.sDateTimeOccur,V.Local.iLine,V.Local.sQuery)
+			F.ODBC.Connection!PSQL_con.Execute(V.Local.sQuery)
+			
+			F.Intrinsic.String.Build("SELECT CONVERT(DateTimeOccur,SQL_VARCHAR) As DateTimeOccur, Line, Job, Suffix, Sequence, DateTransaction, Workcenter, Employee, StartTime, EndTime, HoursWorked, Closed, GoodPieces, BadPieces, ScrapCode, ErrorMessage FROM GAB_6407_FAILED_TRAN WHERE DateTimeOccur = '{0}' ORDER BY LINE;",V.Local.sDateTimeOccur,V.Local.sQuery)	
+			F.Intrinsic.Control.If(V.DataTable.dtDetail.Exists)
+				gui.frmMain.gsgcDetail.ClearRows("gvDetail")
+				F.Data.DataView.Close("dtDetail","dvDetail")
+				F.Data.DataTable.Close("dtDetail")
+			F.Intrinsic.Control.EndIf
+			F.Data.DataTable.CreateFromSQL("dtDetail","PSQL_con",V.Local.sQuery,True)
+			
+			'Add new Columns
+			F.Data.DataTable.AddColumn("dtDetail","Restore","Long")
+			F.Data.DataTable.AddColumn("dtDetail","Delete","Long")
+			
+			F.Intrinsic.Control.CallSub(FormatDetailData)
+		F.Intrinsic.Control.EndIf
+		
+	F.Intrinsic.Control.ElseIf(V.Args.Column.UCase,=,"DELETE")
+		V.Local.sDateTimeOccur.Set(V.DataTable.dtDetail(V.Args.RowIndex).DateTimeOccur!FieldValTrim)
+		V.Local.iLine.Set(V.DataTable.dtDetail(V.Args.RowIndex).Line!FieldVal)
+		F.Intrinsic.String.Build("DELETE FROM GAB_6407_FAILED_TRAN WHERE DateTimeOccur = '{0}' AND Line = {1};",V.Local.sDateTimeOccur,V.Local.iLine,V.Local.sQuery)
+		F.ODBC.Connection!PSQL_con.Execute(V.Local.sQuery)
+		
+		F.Intrinsic.String.Build("SELECT COUNT(*) FROM GAB_6407_FAILED_TRAN WHERE DateTimeOccur = '{0}';",V.Local.sDateTimeOccur,V.Local.sQuery)
+		F.ODBC.Connection!PSQL_con.ExecuteAndReturn(V.Local.sQuery,V.Local.sRet)
+		
+		F.Intrinsic.String.Build("DateTimeOccur = '{0}'",V.Local.sDateTimeOccur,V.Local.sFilter)
+		F.Data.DataTable.Select("dtSummary",V.Local.sFilter,V.Local.sReturnValue)
+		F.Intrinsic.Control.If(V.Local.sReturnValue.Trim,<>,"***NORETURN***")
+			F.Data.DataTable.SetValue("dtSummary",V.Local.sReturnValue.Long,"TotalRec",V.Local.sRet.Long)
+			F.Data.DataTable.AcceptChanges("dtSummary")
+		F.Intrinsic.Control.EndIf
+		
+		F.Data.DataTable.DeleteRow("dtDetail",V.Args.RowIndex)
+		F.Data.DataTable.AcceptChanges("dtDetail")
+	
+	F.Intrinsic.Control.EndIf
+	
+'	'Enable clicking event on the EditorButton
+'	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Restore","AllowEdit",False)
+'	gui.frmMain.gsgcDetail.SetColumnProperty("gvDetail","Delete","AllowEdit",False)
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Global.sError)
+	F.Intrinsic.UI.Msgbox(V.Global.sError)
+	F.Intrinsic.Control.CallSub(Unload)
+F.Intrinsic.Control.EndTry	
+Program.Sub.gsgcDetail_RowCellClick.End
+
+Program.Sub.gsgcDetail_CellValueChanged.Start
+F.Intrinsic.Control.Try
+	
+'	V.Local.bErrorFound.Declare
+'	V.Local.bExists.Declare
+	V.Local.sMilliSecond.Declare
+	V.Local.sTempString.Declare
+		
+'	V.Local.bErrorFound.Set(False)
+	F.Intrinsic.Control.SelectCase(V.Args.Column.UCase)
+		F.Intrinsic.Control.CaseAny("JOB")
+			F.Intrinsic.Control.If(V.Args.Value.Trim,=,"")
+				F.Data.DataTable.SetValue("dtDetail",V.Args.RowIndex,"Job",V.Global.sJob)
+				F.Data.DataTable.AcceptChanges("dtDetail")
+'				V.Local.bErrorFound.Set(True)
+			F.Intrinsic.Control.Else
+				F.Intrinsic.Control.CallSub(UpdateFailedTranTable,"sColumnName",V.Args.Column,"sValue",V.Args.Value.Trim,"sDateTimeOccur",V.DataTable.dtDetail(V.Args.RowIndex).DateTimeOccur!FieldValTrim,"iLine",V.DataTable.dtDetail(V.Args.RowIndex).Line!FieldVal)
+'				V.Local.bErrorFound.Set(False)
+			F.Intrinsic.Control.EndIf
+			
+		F.Intrinsic.Control.CaseAny("SEQUENCE")
+			F.Intrinsic.Control.If(V.Args.Value.Trim,=,"")
+				F.Data.DataTable.SetValue("dtDetail",V.Args.RowIndex,"Sequence",V.Global.sSequence)
+				F.Data.DataTable.AcceptChanges("dtDetail")
+'				V.Local.bErrorFound.Set(True)
+			F.Intrinsic.Control.Else
+				F.Intrinsic.String.LPad(V.Args.Value.Trim,"0",6,V.Local.sTempString)
+				F.Data.DataTable.SetValue("dtDetail",V.Args.RowIndex,"Sequence",V.Local.sTempString)
+				F.Data.DataTable.AcceptChanges("dtDetail")
+				F.Intrinsic.Control.CallSub(UpdateFailedTranTable,"sColumnName",V.Args.Column,"sValue",V.Local.sTempString,"sDateTimeOccur",V.DataTable.dtDetail(V.Args.RowIndex).DateTimeOccur!FieldValTrim,"iLine",V.DataTable.dtDetail(V.Args.RowIndex).Line!FieldVal)
+'				V.Local.bErrorFound.Set(False)
+			F.Intrinsic.Control.EndIf
+		
+		F.Intrinsic.Control.CaseAny("WORKCENTER")
+			F.Intrinsic.Control.If(V.Args.Value.Trim,=,"")
+				F.Data.DataTable.SetValue("dtDetail",V.Args.RowIndex,"Workcenter",V.Global.sWorkcenter)
+				F.Data.DataTable.AcceptChanges("dtDetail")
+'				V.Local.bErrorFound.Set(True)
+			F.Intrinsic.Control.Else
+				F.Intrinsic.Control.CallSub(UpdateFailedTranTable,"sColumnName",V.Args.Column,"sValue",V.Args.Value.Trim,"sDateTimeOccur",V.DataTable.dtDetail(V.Args.RowIndex).DateTimeOccur!FieldValTrim,"iLine",V.DataTable.dtDetail(V.Args.RowIndex).Line!FieldVal)
+'				V.Local.bErrorFound.Set(False)
+			F.Intrinsic.Control.EndIf
+			
+		F.Intrinsic.Control.CaseAny("EMPLOYEE")
+			F.Intrinsic.Control.If(V.Args.Value.Trim,=,"")
+				F.Data.DataTable.SetValue("dtDetail",V.Args.RowIndex,"Employee",V.Global.sEmployee)
+				F.Data.DataTable.AcceptChanges("dtDetail")
+'				V.Local.bErrorFound.Set(True)
+			F.Intrinsic.Control.Else
+				F.Intrinsic.String.LPad(V.Args.Value.Trim,"0",5,V.Local.sTempString)
+				F.Data.DataTable.SetValue("dtDetail",V.Args.RowIndex,"Employee",V.Local.sTempString)
+				F.Data.DataTable.AcceptChanges("dtDetail")
+				F.Intrinsic.Control.CallSub(UpdateFailedTranTable,"sColumnName",V.Args.Column,"sValue",V.Local.sTempString,"sDateTimeOccur",V.DataTable.dtDetail(V.Args.RowIndex).DateTimeOccur!FieldValTrim,"iLine",V.DataTable.dtDetail(V.Args.RowIndex).Line!FieldVal)
+'				V.Local.bErrorFound.Set(False)
+			F.Intrinsic.Control.EndIf
+			
+		F.Intrinsic.Control.CaseAny("STARTTIME")
+			F.Intrinsic.Control.If(V.Args.Value.Trim,=,"")
+				F.Data.DataTable.SetValue("dtDetail",V.Args.RowIndex,"StartTime",V.Global.sStartTime)
+				F.Data.DataTable.AcceptChanges("dtDetail")
+'				V.Local.bErrorFound.Set(True)
+			F.Intrinsic.Control.Else			
+				F.Intrinsic.String.Right(V.Global.sStartTime,4,V.Local.sMilliSecond)
+				F.Intrinsic.String.Format(V.Args.Value,"yyyy-mm-dd Hh:Nn:Ss",V.Local.sTempString)
+				F.Intrinsic.String.Concat(V.Local.sTempString,V.Local.sMilliSecond,V.Local.sTempString)
+				F.Data.DataTable.SetValue("dtDetail",V.Args.RowIndex,"StartTime",V.Local.sTempString)
+				F.Data.DataTable.AcceptChanges("dtDetail")
+				F.Intrinsic.Control.CallSub(UpdateFailedTranTable,"sColumnName",V.Args.Column,"sValue",V.Local.sTempString,"sDateTimeOccur",V.DataTable.dtDetail(V.Args.RowIndex).DateTimeOccur!FieldValTrim,"iLine",V.DataTable.dtDetail(V.Args.RowIndex).Line!FieldVal)
+'				V.Local.bErrorFound.Set(False)				
+			F.Intrinsic.Control.EndIf
+			
+		F.Intrinsic.Control.CaseAny("ENDTIME")
+			F.Intrinsic.Control.If(V.Args.Value.Trim,=,"")
+				F.Data.DataTable.SetValue("dtDetail",V.Args.RowIndex,"EndTime",V.Global.sEndTime)
+				F.Data.DataTable.AcceptChanges("dtDetail")
+'				V.Local.bErrorFound.Set(True)
+			F.Intrinsic.Control.Else			
+				F.Intrinsic.String.Right(V.Global.sEndTime,4,V.Local.sMilliSecond)
+				F.Intrinsic.String.Format(V.Args.Value,"yyyy-mm-dd Hh:Nn:Ss",V.Local.sTempString)
+				F.Intrinsic.String.Concat(V.Local.sTempString,V.Local.sMilliSecond,V.Local.sTempString)
+				F.Data.DataTable.SetValue("dtDetail",V.Args.RowIndex,"EndTime",V.Local.sTempString)
+				F.Data.DataTable.AcceptChanges("dtDetail")
+				F.Intrinsic.Control.CallSub(UpdateFailedTranTable,"sColumnName",V.Args.Column,"sValue",V.Local.sTempString,"sDateTimeOccur",V.DataTable.dtDetail(V.Args.RowIndex).DateTimeOccur!FieldValTrim,"iLine",V.DataTable.dtDetail(V.Args.RowIndex).Line!FieldVal)
+'				V.Local.bErrorFound.Set(False)				
+			F.Intrinsic.Control.EndIf
+			
+		F.Intrinsic.Control.CaseAny("CLOSED")			
+			F.Intrinsic.Control.If(V.Args.Value.Trim,=,"")
+				F.Data.DataTable.SetValue("dtDetail",V.Args.RowIndex,"Closed",V.Global.sClosed)
+				F.Data.DataTable.AcceptChanges("dtDetail")
+'				V.Local.bErrorFound.Set(True)
+			F.Intrinsic.Control.Else
+				F.Intrinsic.Control.CallSub(UpdateFailedTranTable,"sColumnName",V.Args.Column,"sValue",V.Args.Value.Trim,"sDateTimeOccur",V.DataTable.dtDetail(V.Args.RowIndex).DateTimeOccur!FieldValTrim,"iLine",V.DataTable.dtDetail(V.Args.RowIndex).Line!FieldVal)
+'				V.Local.bErrorFound.Set(False)
+			F.Intrinsic.Control.EndIf
+			
+		F.Intrinsic.Control.CaseAny("GOODPIECES")
+			F.Intrinsic.Control.If(V.Args.Value.Trim,=,"")
+				F.Data.DataTable.SetValue("dtDetail",V.Args.RowIndex,"GoodPieces",V.Global.iGoodPieces)
+				F.Data.DataTable.AcceptChanges("dtDetail")
+'				V.Local.bErrorFound.Set(True)
+			F.Intrinsic.Control.Else
+				F.Intrinsic.Control.CallSub(UpdateFailedTranTable,"sColumnName",V.Args.Column,"sValue",V.Args.Value.Long,"sDateTimeOccur",V.DataTable.dtDetail(V.Args.RowIndex).DateTimeOccur!FieldValTrim,"iLine",V.DataTable.dtDetail(V.Args.RowIndex).Line!FieldVal)
+'				V.Local.bErrorFound.Set(False)
+			F.Intrinsic.Control.EndIf
+			
+		F.Intrinsic.Control.CaseAny("BADPIECES")
+			F.Intrinsic.Control.If(V.Args.Value.Trim,=,"")
+				F.Data.DataTable.SetValue("dtDetail",V.Args.RowIndex,"BadPieces",V.Global.iBadPieces)
+				F.Data.DataTable.AcceptChanges("dtDetail")
+'				V.Local.bErrorFound.Set(True)
+			F.Intrinsic.Control.Else
+				F.Intrinsic.Control.CallSub(UpdateFailedTranTable,"sColumnName",V.Args.Column,"sValue",V.Args.Value.Long,"sDateTimeOccur",V.DataTable.dtDetail(V.Args.RowIndex).DateTimeOccur!FieldValTrim,"iLine",V.DataTable.dtDetail(V.Args.RowIndex).Line!FieldVal)
+'				V.Local.bErrorFound.Set(False)
+			F.Intrinsic.Control.EndIf
+			
+'		F.Intrinsic.Control.CaseAny("SCRAPCODE")
+'			F.Intrinsic.Control.If(V.Args.Value.Trim,=,"")
+''				V.Local.bErrorFound.Set(True)
+'			F.Intrinsic.Control.Else
+'				F.Intrinsic.Control.CallSub(UpdateFailedTranTable,"sColumnName",V.Args.Column,"sValue",V.Args.Value.Trim,"sDateTimeOccur",V.DataTable.dtDetail(V.Args.RowIndex).DateTimeOccur!FieldValTrim,"iLine",V.DataTable.dtDetail(V.Args.RowIndex).Line!FieldVal)
+''				V.Local.bErrorFound.Set(False)
+'			F.Intrinsic.Control.EndIf
+			
+	F.Intrinsic.Control.EndSelect
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Global.sError)
+	F.Intrinsic.UI.Msgbox(V.Global.sError)
+	F.Intrinsic.Control.CallSub(Unload)
+F.Intrinsic.Control.EndTry
+Program.Sub.gsgcDetail_CellValueChanged.End
+
+Program.Sub.gsgcDetail_MouseDown.Start
+F.Intrinsic.Control.Try
+	
+	V.Local.sColumnName.Declare
+
+	F.Intrinsic.Control.If(V.Args.MouseCol,>,-1)
+		Gui.frmMain.gsgcDetail.GetColumnNameByIndex("gvDetail",V.Args.MouseCol,V.Local.sColumnName)
+		F.Intrinsic.Control.SelectCase(V.Local.sColumnName.UCase)
+			F.Intrinsic.Control.CaseAny("JOB")
+				V.Global.sJob.Set(V.DataTable.dtDetail(V.Args.MouseRow).Job!FieldValTrim)
+			F.Intrinsic.Control.CaseAny("SEQUENCE")
+				V.Global.sSequence.Set(V.DataTable.dtDetail(V.Args.MouseRow).Sequence!FieldValTrim)
+			F.Intrinsic.Control.CaseAny("WORKCENTER")
+				V.Global.sWorkcenter.Set(V.DataTable.dtDetail(V.Args.MouseRow).Workcenter!FieldValTrim)
+			F.Intrinsic.Control.CaseAny("EMPLOYEE")
+				V.Global.sEmployee.Set(V.DataTable.dtDetail(V.Args.MouseRow).Employee!FieldValTrim)
+			F.Intrinsic.Control.CaseAny("STARTTIME")
+				V.Global.sStartTime.Set(V.DataTable.dtDetail(V.Args.MouseRow).StartTime!FieldValTrim)
+			F.Intrinsic.Control.CaseAny("ENDTIME")
+				V.Global.sEndTime.Set(V.DataTable.dtDetail(V.Args.MouseRow).EndTime!FieldValTrim)
+			F.Intrinsic.Control.CaseAny("CLOSED")
+				V.Global.sClosed.Set(V.DataTable.dtDetail(V.Args.MouseRow).Closed!FieldValTrim)
+			F.Intrinsic.Control.CaseAny("GOODPIECES")
+				V.Global.iGoodPieces.Set(V.DataTable.dtDetail(V.Args.MouseRow).GoodPieces!FieldVal)
+			F.Intrinsic.Control.CaseAny("BADPIECES")
+				V.Global.iBadPieces.Set(V.DataTable.dtDetail(V.Args.MouseRow).BadPieces!FieldVal)
+'			F.Intrinsic.Control.CaseAny("SCRAPCODE")
+'				V.Global.sScrapCode.Set(V.DataTable.dtDetail(V.Args.MouseRow).ScrapCode!FieldValTrim)
+		F.Intrinsic.Control.EndSelect
+	F.Intrinsic.Control.EndIf
+	
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Global.sError)
+	F.Intrinsic.UI.Msgbox(V.Global.sError)
+	F.Intrinsic.Control.CallSub(Unload)
+F.Intrinsic.Control.EndTry
+Program.Sub.gsgcDetail_MouseDown.End
+
+Program.Sub.gsgcDetail_KeyPress.Start
+F.Intrinsic.Control.Try
+	
+	F.Intrinsic.Control.If(V.Args.RowIndex,<>,V.Global.iRowIndex)
+		V.Global.iRowIndex.Set(V.Args.RowIndex)
+		
+		V.Global.sJob.Set(V.DataTable.dtDetail(V.Args.RowIndex).Job!FieldValTrim)
+		V.Global.sSequence.Set(V.DataTable.dtDetail(V.Args.RowIndex).Sequence!FieldValTrim)
+		V.Global.sWorkcenter.Set(V.DataTable.dtDetail(V.Args.RowIndex).Workcenter!FieldValTrim)
+		V.Global.sEmployee.Set(V.DataTable.dtDetail(V.Args.RowIndex).Employee!FieldValTrim)
+		V.Global.sStartTime.Set(V.DataTable.dtDetail(V.Args.RowIndex).StartTime!FieldValTrim)
+		V.Global.sEndTime.Set(V.DataTable.dtDetail(V.Args.RowIndex).EndTime!FieldValTrim)
+		V.Global.sClosed.Set(V.DataTable.dtDetail(V.Args.RowIndex).Closed!FieldValTrim)
+		V.Global.iGoodPieces.Set(V.DataTable.dtDetail(V.Args.RowIndex).GoodPieces!FieldVal)
+		V.Global.iBadPieces.Set(V.DataTable.dtDetail(V.Args.RowIndex).BadPieces!FieldVal)
+'		V.Global.sScrapCode.Set(V.DataTable.dtDetail(V.Args.RowIndex).ScrapCode!FieldValTrim)
+	F.Intrinsic.Control.EndIf
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Global.sError)
+	F.Intrinsic.UI.Msgbox(V.Global.sError)
+	F.Intrinsic.Control.CallSub(Unload)
+F.Intrinsic.Control.EndTry
+Program.Sub.gsgcDetail_KeyPress.End
+
+Program.Sub.UpdateFailedTranTable.Start
+F.Intrinsic.Control.Try
+
+	V.Local.sQuery.Declare
+	
+	F.Intrinsic.String.Build("UPDATE GAB_6407_FAILED_TRAN SET {0} = '{1}' WHERE DateTimeOccur = '{2}' AND Line = {3};",V.Args.sColumnName,V.Args.sValue,V.Args.sDateTimeOccur,V.Args.iLine,V.Local.sQuery)
+	F.ODBC.Connection!PSQL_con.Execute(V.Local.sQuery)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Global.sError)
+	F.Intrinsic.UI.Msgbox(V.Global.sError)
+	F.Intrinsic.Control.CallSub(Unload)
+F.Intrinsic.Control.EndTry
+Program.Sub.UpdateFailedTranTable.End
+
+Program.Sub.cmdRefresh_Click.Start
+F.Intrinsic.Control.Try
+	
+	'Validate From and To Date
+	F.Intrinsic.Control.If(v.Screen.frmMain!dtpLastEndTimeFrom.Value,>,v.Screen.frmMain!dtpLastEndTimeTo.Value)
+		Gui.frmMain..ShowAlert("myAlert","GAB_6407_Labor_Charge_From_OEE","From Date cannot be greater than To Date")
+		Gui.frmMain..UpdateAlertProperty("myAlert",v.Enum.AlertPropertyNames!SvgImage,v.Enum.Image!ERROR_COLOR)
+		F.Intrinsic.Control.ExitSub
+	F.Intrinsic.Control.EndIf
+	
+	Gui.frmMain.pbProcess.Visible(True)
+	
+	F.Intrinsic.Control.If(V.DataTable.dtSummary.Exists)
+		gui.frmMain.gsgcSummary.ClearRows("gvSummary")
+		F.Data.DataView.Close("dtSummary","dvSummary")
+		F.Data.DataTable.Close("dtSummary")
+	F.Intrinsic.Control.EndIf
+	
+	F.Intrinsic.Control.If(V.DataTable.dtDetail.Exists)
+		gui.frmMain.gsgcDetail.ClearRows("gvDetail")
+		F.Data.DataView.Close("dtDetail","dvDetail")
+		F.Data.DataTable.Close("dtDetail")
+	F.Intrinsic.Control.EndIf
+		
+	F.Intrinsic.Control.CallSub(LoadSummaryData)
+	
+	Gui.frmMain.pbProcess.Visible(False)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Global.sError)
+	F.Intrinsic.UI.Msgbox(V.Global.sError)
+	F.Intrinsic.Control.CallSub(Unload)
+F.Intrinsic.Control.EndTry
+Program.Sub.cmdRefresh_Click.End
+
+Program.Sub.Comments.Start
+${$5$}$20.1.8210.19558$}$1
+${$6$}$tdjohan$}$20220712115642415$}$8rAQhOSvlohpQhMDm1j544LwmwXnRbkh+nSvNHGCJb8Dg6StB6uu2OQqvvjigLNZ1VTBbReE3r8=
+Program.Sub.Comments.End
