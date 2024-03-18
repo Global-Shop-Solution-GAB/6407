@@ -1,0 +1,677 @@
+Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.ProcessData.Start
+F.Intrinsic.Control.Try
+'	V.Local.sQuery.Declare
+'	V.Local.sLastEndTime.Declare
+'	V.Local.sBeginLastEndTime.Declare
+'	V.Local.sEndLastEndTime.Declare
+	V.Local.iRow.Declare
+	V.Local.sMessage.Declare
+	V.Local.sWorkOrder.Declare
+	V.Local.sJob.Declare
+	V.Local.sSuffix.Declare
+	V.Local.sSeq.Declare
+	V.Local.bFlagSetup.Declare
+	V.Local.sDateTransaction.Declare
+	V.Local.sDateSeq.Declare
+	V.Local.sWC.Declare
+	V.Local.sEmployee.Declare
+	V.Local.sStartTime.Declare
+	V.Local.sEndTime.Declare
+	V.Local.iTotalSecondsWorked.Declare
+	V.Local.fTotalHoursWorked.Declare
+	V.Local.sHrsWorked.Declare
+	V.Local.sFlagClsd.Declare
+	V.Local.sFlagIndirect.Declare
+	V.Local.sRateType.Declare
+	V.Local.sGoodPieces.Declare
+	V.Local.sBadPieces.Declare
+	V.Local.sScrapCode.Declare
+'	V.Local.sString.Declare
+'	V.Local.sFile.Declare
+	V.Local.sProcessMsg.Declare
+	V.Local.iRecNo.Declare
+	V.Local.sRet.Declare
+	V.Local.dStartDateTime.Declare
+	V.Local.dEndDateTime.Declare
+'	V.Local.dTempDateTime.Declare
+	V.Local.sTempDateTime.Declare
+	V.Local.fGoodPieces.Declare
+	V.Local.fCompletedPieces.Declare
+	V.Local.fEstimatedPieces.Declare
+	V.Local.fTotalCompletedPieces.Declare
+
+	'Verify, Analyze and Process the OEE data into GSS
+	V.Global.sString.Set("")
+	F.Intrinsic.Control.For(V.Local.iRow,0,V.DataTable.dtOEE.RowCount--,1)
+
+		'Update the Record Processing Progress Bar & Status
+		F.Intrinsic.Math.Add(v.Local.iRow,1,V.Local.iRecNo)
+		Gui.frmMain.pbProcess.Value(V.Local.iRecNo)
+		F.Intrinsic.String.Build("Step 1: Processing Record {0} of {1}",V.Screen.frmMain!pbProcess.Value,V.DataTable.dtOEE.RowCount,V.Local.sProcessMsg)
+		Gui.frmMain.lblProcess.Caption(V.Local.sProcessMsg)	
+
+		'Grab the LastEndTime
+		V.Global.sLastStartTime.Set(V.DataTable.dtOEE(V.Local.iRow).StartTime!FieldVal)
+		V.Global.sLastEndTime.Set(V.DataTable.dtOEE(V.Local.iRow).EndTime!FieldVal)
+
+		'Update Null Quantity to be ZERO
+		F.Intrinsic.Control.If(V.DataTable.dtOEE(V.Local.iRow).GoodPieces!FieldVal,=,"NULL",OR,V.DataTable.dtOEE(V.Local.iRow).GoodPieces!FieldVal,=,"")
+			F.Data.DataTable.SetValue("dtOEE",V.Local.iRow,"GoodPieces",0.00)
+		F.Intrinsic.Control.EndIf
+		F.Intrinsic.Control.If(V.DataTable.dtOEE(V.Local.iRow).BadPieces!FieldVal,=,"NULL",OR,V.DataTable.dtOEE(V.Local.iRow).BadPieces!FieldVal,=,"")
+			F.Data.DataTable.SetValue("dtOEE",V.Local.iRow,"BadPieces",0.00)
+		F.Intrinsic.Control.EndIf
+
+		'Format ScrapCode
+		F.Intrinsic.Control.If(V.DataTable.dtOEE(V.Local.iRow).ScrapCode!FieldVal,=,"NULL",OR,V.DataTable.dtOEE(V.Local.iRow).ScrapCode!FieldVal,=,"")
+			F.Data.DataTable.SetValue("dtOEE",V.Local.iRow,"ScrapCode","")
+		F.Intrinsic.Control.EndIf
+
+		'Format Employee
+		F.Intrinsic.String.LPad(V.DataTable.dtOEE(V.Local.iRow).Employee!FieldValTrim,"0",5,V.Local.sEmployee)
+		F.Data.DataTable.SetValue("dtOEE",V.Local.iRow,"Employee",V.Local.sEmployee)
+
+		'1. Validate Job, Suffix, Seq
+		'Job column from OEE contains Job No & Job Suffix
+		F.Intrinsic.String.Split(V.DataTable.dtOEE(V.Local.iRow).WorkOrder!FieldValTrim,"-",V.Local.sWorkOrder)
+		F.Intrinsic.Control.If(V.Local.sWorkOrder(0),=,"OOB")
+			V.Local.sJob.Set("")
+		F.Intrinsic.Control.Else
+			V.Local.sJob.Set(V.Local.sWorkOrder(0).Trim)
+		F.Intrinsic.Control.EndIf
+		F.Intrinsic.Control.If(V.Local.sWorkOrder(1),=,"OOB")
+			V.Local.sSuffix.Set("")
+		F.Intrinsic.Control.Else
+			V.Local.sSuffix.Set(V.Local.sWorkOrder(1).Trim)
+		F.Intrinsic.Control.EndIf
+		F.Intrinsic.String.LPad(V.DataTable.dtOEE(V.Local.iRow).Seq!FieldValTrim,"0",6,V.Local.sSeq)
+		F.Intrinsic.Control.CallSub(ValidateJob,"sJob",V.Local.sJob,"sSuffix",V.Local.sSuffix,"sSeq",V.Local.sSeq)
+		F.Intrinsic.Control.If(V.Args.bValidJob)
+		F.Intrinsic.Control.AndIf(V.Args.bLaborSeq)
+		F.Intrinsic.Control.AndIf(V.Args.bJobClosed)
+			'Set the Failed Flag to True
+			V.Local.sMessage.Set("Work Order is already closed.")
+			F.Data.DataTable.SetValue("dtOEE",V.Local.iRow,"Failed",True,"ErrorMessage",V.Local.sMessage)
+			F.Intrinsic.Control.GoTo("ForLoopEnd")
+		F.Intrinsic.Control.ElseIf(V.Args.bValidJob)
+		F.Intrinsic.Control.AndIf(V.Args.bLaborSeq)
+		F.Intrinsic.Control.AndIf(V.Args.bJobSeqClosed)
+			'Set the Failed Flag to True
+			V.Local.sMessage.Set("Job Sequence is already closed.")
+			F.Data.DataTable.SetValue("dtOEE",V.Local.iRow,"Failed",True,"ErrorMessage",V.Local.sMessage)
+			F.Intrinsic.Control.GoTo("ForLoopEnd")
+		F.Intrinsic.Control.ElseIf(V.Args.bValidJob.Not)
+			'Set the Failed Flag to True
+			V.Local.sMessage.Set("Invalid Work Order.")
+			F.Data.DataTable.SetValue("dtOEE",V.Local.iRow,"Failed",True,"ErrorMessage",V.Local.sMessage)
+			F.Intrinsic.Control.GoTo("ForLoopEnd")
+		F.Intrinsic.Control.ElseIf(V.Args.bLaborSeq.Not)
+			'Set the Failed Flag to True
+			V.Local.sMessage.Set("Job Sequence is not a Labor sequence.")
+			F.Data.DataTable.SetValue("dtOEE",V.Local.iRow,"Failed",True,"ErrorMessage",V.Local.sMessage)
+			F.Intrinsic.Control.GoTo("ForLoopEnd")
+		F.Intrinsic.Control.Else
+			'Setup Sequence
+			V.Local.bFlagSetup.Set(V.Args.bFlagSetup)
+		F.Intrinsic.Control.EndIf
+
+		'2. Validate Date Transaction
+		F.Intrinsic.String.Format(V.DataTable.dtOEE(V.Local.iRow).DateTransaction!FieldVal,"YYYYMMDD",V.Local.sDateTransaction)
+		F.Intrinsic.Control.CallSub(ValidateDate,"sDateInput",V.Local.sDateTransaction,"sDateInputFormat","YYYYMMDD","sDateOutputFormat","MMDDYY")
+		F.Intrinsic.Control.If(V.Args.bValidDate)
+			V.Local.sDateSeq.Set(V.Args.sRetDate)
+		F.Intrinsic.Control.Else
+			'Set the Failed Flag to True
+			V.Local.sMessage.Set("Invalid Date Transaction.")
+			F.Data.DataTable.SetValue("dtOEE",V.Local.iRow,"Failed",True,"ErrorMessage",V.Local.sMessage)
+			F.Intrinsic.Control.GoTo("ForLoopEnd")
+		F.Intrinsic.Control.EndIf	
+
+		'3. Validate Workcenter		
+		F.Intrinsic.Control.CallSub(ValidateWorkcenter,"sWorkcenter",V.DataTable.dtOEE(V.Local.iRow).Workcenter!FieldValTrim)
+		F.Intrinsic.Control.If(V.Args.bValidWorkGroup)
+			V.Local.sWC.Set(V.DataTable.dtOEE(V.Local.iRow).Workcenter!FieldValTrim)
+		F.Intrinsic.Control.ElseIf(V.Args.bValidWorkCenter)
+			V.Local.sWC.Set(V.DataTable.dtOEE(V.Local.iRow).Workcenter!FieldValTrim)
+		F.Intrinsic.Control.Else
+			'Set the Failed Flag to True
+			V.Local.sMessage.Set("Invalid Workcenter.")
+			F.Data.DataTable.SetValue("dtOEE",V.Local.iRow,"Failed",True,"ErrorMessage",V.Local.sMessage)
+			F.Intrinsic.Control.GoTo("ForLoopEnd")
+		F.Intrinsic.Control.EndIf
+
+		'4. Validate Employee
+		V.Local.sEmployee.Set(V.DataTable.dtOEE(V.Local.iRow).Employee!FieldValTrim)
+		F.Intrinsic.Control.CallSub(ValidateEmployee,"sEmployee",V.Local.sEmployee)
+		F.Intrinsic.Control.If(V.Args.bValid.Not)
+			'Set the Failed Flag to True
+			V.Local.sMessage.Set("Invalid Employee.")
+			F.Data.DataTable.SetValue("dtOEE",V.Local.iRow,"Failed",True,"ErrorMessage",V.Local.sMessage)
+			F.Intrinsic.Control.GoTo("ForLoopEnd")
+		F.Intrinsic.Control.EndIf
+
+		'5. Validate StartTime
+		F.Intrinsic.Control.If(V.DataTable.dtOEE(V.Local.iRow).StartTime!FieldVal,=,"NULL",OR,V.DataTable.dtOEE(V.Local.iRow).StartTime!FieldVal,=,"")
+			'Set Failed Flag to True
+			V.Local.sMessage.Set("Start Time is missing.")
+			F.Data.DataTable.SetValue("dtOEE",V.Local.iRow,"Failed",True,"ErrorMessage",V.Local.sMessage)
+			F.Intrinsic.Control.GoTo("ForLoopEnd")
+		F.Intrinsic.Control.Else
+			V.Local.sTempDateTime.Set(V.DataTable.dtOEE(V.Local.iRow).StartTime!FieldVal)
+			V.Local.dStartDateTime.Set(V.Local.sTempDateTime.PSQLFriendly)
+			F.Intrinsic.String.Format(V.Local.dStartDateTime,"HhNn",V.Local.sStartTime)
+	'		F.Intrinsic.String.Format(V.DataTable.dtOEE(V.Local.iRow).StartTime!FieldVal,"HhNn",V.Local.sStartTime)
+			F.Intrinsic.Control.CallSub(ValidateTime,"sTime",V.Local.sStartTime)
+			F.Intrinsic.Control.If(V.Args.bValid.Not)
+				'Set Failed Flag to True
+				V.Local.sMessage.Set("Invalid Start Time.")
+				F.Data.DataTable.SetValue("dtOEE",V.Local.iRow,"Failed",True,"ErrorMessage",V.Local.sMessage)
+				F.Intrinsic.Control.GoTo("ForLoopEnd")
+			F.Intrinsic.Control.EndIf
+		F.Intrinsic.Control.EndIf
+
+		'6. Validate EndTime
+		F.Intrinsic.Control.If(V.DataTable.dtOEE(V.Local.iRow).EndTime!FieldVal,=,"NULL",OR,V.DataTable.dtOEE(V.Local.iRow).EndTime!FieldVal,=,"")
+			'Set Failed Flag to True
+			V.Local.sMessage.Set("End Time is missing.")
+			F.Data.DataTable.SetValue("dtOEE",V.Local.iRow,"Failed",True,"ErrorMessage",V.Local.sMessage)
+			F.Intrinsic.Control.GoTo("ForLoopEnd")
+		F.Intrinsic.Control.Else
+			V.Local.sTempDateTime.Set(V.DataTable.dtOEE(V.Local.iRow).EndTime!FieldVal)
+			V.Local.dEndDateTime.Set(V.Local.sTempDateTime.PSQLFriendly)
+			F.Intrinsic.String.Format(V.Local.dEndDateTime,"HhNn",V.Local.sEndTime)
+	'		F.Intrinsic.String.Format(V.DataTable.dtOEE(V.Local.iRow).EndTime!FieldVal,"HhNn",V.Local.sEndTime)
+			F.Intrinsic.Control.CallSub(ValidateTime,"sTime",V.Local.sEndTime)
+			F.Intrinsic.Control.If(V.Args.bValid.Not)
+				'Set Failed Flag to True
+				V.Local.sMessage.Set("Invalid End Time.")
+				F.Data.DataTable.SetValue("dtOEE",V.Local.iRow,"Failed",True,"ErrorMessage",V.Local.sMessage)
+				F.Intrinsic.Control.GoTo("ForLoopEnd")
+			F.Intrinsic.Control.EndIf
+		F.Intrinsic.Control.EndIf
+
+		'7. Validate Hours Worked
+		'Calculate Total Hours Worked (Cannot be greater than 23:59 hours)
+		F.Intrinsic.Date.DateDiff("S",V.Local.dStartDateTime,V.Local.dEndDateTime,V.Local.iTotalSecondsWorked)
+	'	F.Intrinsic.Date.DateDiff("S",V.DataTable.dtOEE(V.Local.iRow).StartTime!FieldVal,V.DataTable.dtOEE(V.Local.iRow).EndTime!FieldVal,V.Local.iTotalSecondsWorked)
+		F.Intrinsic.Math.Div(V.Local.iTotalSecondsWorked.Float,3600,V.Local.fTotalHoursWorked)
+		F.Intrinsic.Control.If(V.Local.fTotalHoursWorked,>=,24.0)
+			V.Local.sMessage.Set("Total Hours Worked is more than or equal to 24 hours.")
+			F.Data.DataTable.SetValue("dtOEE",V.Local.iRow,"Failed",True,"ErrorMessage",V.Local.sMessage)
+			F.Intrinsic.Control.GoTo("ForLoopEnd")
+		F.Intrinsic.Control.Else
+			F.Data.DataTable.SetValue("dtOEE",V.Local.iRow,"HoursWorked",V.Local.fTotalHoursWorked)
+			F.Intrinsic.String.Format(V.Local.fTotalHoursWorked,"0.0000",V.Local.sHrsWorked)
+		F.Intrinsic.Control.EndIf
+
+'		Removed because OEE always returns Flag_Closed = 'Y' even though the Run Qty is not completed.
+'		Will set the Flag_Closed by counting the total quantity completed
+'		The unit completed always be equal or lesser than the Run Quantity in WO. 
+'		-	If the unit completed is greater than the Run Quantity, there should be an error message for example, ?The quantity exceeded the actual Run Quantity?
+'		-	If the unit completed is equal to the Run Quantity, we need to switch the Flag Closed to ?Y?. 
+'		-	If the unit completed is less than the Run Quantity, we need to switch the Flag Closed to ?N?. 
+'		'8. Flag Closed
+'		F.Intrinsic.Control.If(V.DataTable.dtOEE(V.Local.iRow).Closed!FieldValTrim,<>,"")
+'		F.Intrinsic.Control.AndIf(V.DataTable.dtOEE(V.Local.iRow).Closed!FieldValTrim,<>,"Y")
+'		F.Intrinsic.Control.AndIf(V.DataTable.dtOEE(V.Local.iRow).Closed!FieldValTrim,<>,"N")
+'			V.Local.sMessage.Set("Flag Closed is invalid.")
+'			F.Data.DataTable.SetValue("dtOEE",V.Local.iRow,"Failed",True,"ErrorMessage",V.Local.sMessage)
+'			F.Intrinsic.Control.GoTo("ForLoopEnd")
+'		F.Intrinsic.Control.Else
+'			V.Local.sFlagClsd.Set(V.DataTable.dtOEE(V.Local.iRow).Closed!FieldValTrim)
+'		F.Intrinsic.Control.EndIf
+
+		'For now, the JB0455 callwrapper does not support Setup Labor Type. The Setup Labor type will be converted to Direct Labor Type automatically.
+		'8. Flag Indirect (D,S,I)
+		F.Intrinsic.Control.If(V.Local.bFlagSetup)
+			V.Local.sFlagIndirect.Set("S")
+		F.Intrinsic.Control.Else
+			V.Local.sFlagIndirect.Set("D")
+		F.Intrinsic.Control.EndIf
+
+		'9. Rate Type (R,O,2)
+		V.Local.sRateType.Set("R")
+
+'		Change the logic. For Setup sequence, do not look at the Good Pieces and Bad Pieces. They always need to be considered as ZERO.
+		'10. Good Pieces
+		F.Intrinsic.Control.If(V.Local.bFlagSetup)
+			F.Intrinsic.String.Format(0,"0.0000",V.Local.sGoodPieces)
+		F.Intrinsic.Control.Else
+			F.Intrinsic.Control.CallSub(ValidateQty,"sQty",V.DataTable.dtOEE(V.Local.iRow).GoodPieces!FieldVal)
+			F.Intrinsic.Control.If(V.Args.bValid)
+				V.Local.sGoodPieces.Set(V.DataTable.dtOEE(V.Local.iRow).GoodPieces!FieldVal)
+				F.Intrinsic.String.Format(V.Local.sGoodPieces,"0.0000",V.Local.sGoodPieces)
+			F.Intrinsic.Control.Else
+				V.Local.sMessage.Set("Good Pieces is invalid.")
+				F.Data.DataTable.SetValue("dtOEE",V.Local.iRow,"Failed",True,"ErrorMessage",V.Local.sMessage)
+				F.Intrinsic.Control.GoTo("ForLoopEnd")
+			F.Intrinsic.Control.EndIf
+		F.Intrinsic.Control.EndIf
+
+		'11. Bad Pieces
+		F.Intrinsic.Control.If(V.Local.bFlagSetup)
+			F.Intrinsic.String.Format(0,"0.0000",V.Local.sBadPieces)
+		F.Intrinsic.Control.Else
+			F.Intrinsic.Control.CallSub(ValidateQty,"sQty",V.DataTable.dtOEE(V.Local.iRow).BadPieces!FieldVal)
+			F.Intrinsic.Control.If(V.Args.bValid)
+				V.Local.sBadPieces.Set(V.DataTable.dtOEE(V.Local.iRow).BadPieces!FieldVal)
+				F.Intrinsic.String.Format(V.Local.sBadPieces,"0.0000",V.Local.sBadPieces)
+			F.Intrinsic.Control.Else
+				V.Local.sMessage.Set("Bad Pieces is invalid.")
+				F.Data.DataTable.SetValue("dtOEE",V.Local.iRow,"Failed",True,"ErrorMessage",V.Local.sMessage)
+				F.Intrinsic.Control.GoTo("ForLoopEnd")
+			F.Intrinsic.Control.EndIf
+		F.Intrinsic.Control.EndIf
+'		'10. Good Pieces
+'		F.Intrinsic.Control.CallSub(ValidateQty,"sQty",V.DataTable.dtOEE(V.Local.iRow).GoodPieces!FieldVal)
+'		F.Intrinsic.Control.If(V.Args.bValid)
+'			V.Local.sGoodPieces.Set(V.DataTable.dtOEE(V.Local.iRow).GoodPieces!FieldVal)
+'			F.Intrinsic.String.Format(V.Local.sGoodPieces,"0.0000",V.Local.sGoodPieces)
+'		F.Intrinsic.Control.Else
+'			V.Local.sMessage.Set("Good Pieces is invalid.")
+'			F.Data.DataTable.SetValue("dtOEE",V.Local.iRow,"Failed",True,"ErrorMessage",V.Local.sMessage)
+'			F.Intrinsic.Control.GoTo("ForLoopEnd")
+'		F.Intrinsic.Control.EndIf
+'
+'		'11. Bad Pieces
+'		F.Intrinsic.Control.CallSub(ValidateQty,"sQty",V.DataTable.dtOEE(V.Local.iRow).BadPieces!FieldVal)
+'		F.Intrinsic.Control.If(V.Args.bValid)
+'			V.Local.sBadPieces.Set(V.DataTable.dtOEE(V.Local.iRow).BadPieces!FieldVal)
+'			F.Intrinsic.String.Format(V.Local.sBadPieces,"0.0000",V.Local.sBadPieces)
+'		F.Intrinsic.Control.Else
+'			V.Local.sMessage.Set("Bad Pieces is invalid.")
+'			F.Data.DataTable.SetValue("dtOEE",V.Local.iRow,"Failed",True,"ErrorMessage",V.Local.sMessage)
+'			F.Intrinsic.Control.GoTo("ForLoopEnd")
+'		F.Intrinsic.Control.EndIf
+
+		'12. Scrap Code
+		V.Local.sScrapCode.Set("")
+			
+		'13. Flag Closed
+		'If it gets to this line, that means the Job and Suffix and Seq is a valid one
+		'If it is a Setup sequence then do not check for Quantity Estimated and Completed, and the Flag Closed will always be set to 'Y'
+		F.Intrinsic.Control.If(V.Local.bFlagSetup)
+			V.Local.sFlagClsd.Set("Y")
+		F.Intrinsic.Control.Else
+			F.Intrinsic.String.Split(V.DataTable.dtOEE(V.Local.iRow).WorkOrder!FieldValTrim,"-",V.Local.sWorkOrder)
+			F.Intrinsic.Control.If(V.Local.sWorkOrder(0),=,"OOB")
+				V.Local.sMessage.Set("The Job No is invalid.")
+				F.Data.DataTable.SetValue("dtOEE",V.Local.iRow,"Failed",True,"ErrorMessage",V.Local.sMessage)
+				F.Intrinsic.Control.GoTo("ForLoopEnd")
+			F.Intrinsic.Control.Else
+				V.Local.sJob.Set(V.Local.sWorkOrder(0).Trim)
+			F.Intrinsic.Control.EndIf
+			F.Intrinsic.Control.If(V.Local.sWorkOrder(1),=,"OOB")
+				V.Local.sSuffix.Set("")
+			F.Intrinsic.Control.Else
+				V.Local.sSuffix.Set(V.Local.sWorkOrder(1).Trim)
+			F.Intrinsic.Control.EndIf
+			F.Intrinsic.Control.If(V.DataTable.dtOEE(V.Local.iRow).Seq!FieldValTrim,=,"")
+				V.Local.sMessage.Set("The Job Seq is invalid.")
+				F.Data.DataTable.SetValue("dtOEE",V.Local.iRow,"Failed",True,"ErrorMessage",V.Local.sMessage)
+				F.Intrinsic.Control.GoTo("ForLoopEnd")
+			F.Intrinsic.Control.Else
+				F.Intrinsic.String.LPad(V.DataTable.dtOEE(V.Local.iRow).Seq!FieldValTrim,"0",6,V.Local.sSeq)
+			F.Intrinsic.Control.EndIf
+			F.Intrinsic.Control.CallSub(GetQtyFromWoSeq,"sJob",V.Local.sJob,"sSuffix",V.Local.sSuffix,"sSeq",V.Local.sSeq)
+			V.Local.fGoodPieces.Set(V.DataTable.dtOEE(V.Local.iRow).GoodPieces!FieldValFloat)
+			V.Local.fCompletedPieces.Set(V.Args.fCompletedPieces)
+			V.Local.fEstimatedPieces.Set(V.Args.fEstimatedPieces)
+			F.Intrinsic.Math.Add(V.Local.fGoodPieces,V.Local.fCompletedPieces,V.Local.fTotalCompletedPieces)
+			F.Intrinsic.Control.If(V.Local.fTotalCompletedPieces,>,V.Local.fEstimatedPieces)
+				V.Local.sMessage.Set("The total completed qty will exceed the actual run qty.")
+				F.Data.DataTable.SetValue("dtOEE",V.Local.iRow,"Failed",True,"ErrorMessage",V.Local.sMessage)
+				F.Intrinsic.Control.GoTo("ForLoopEnd")
+			F.Intrinsic.Control.ElseIf(V.Local.fTotalCompletedPieces,=,V.Local.fEstimatedPieces)
+				V.Local.sFlagClsd.Set("Y")
+			F.Intrinsic.Control.Else
+				V.Local.sFlagClsd.Set("N")
+			F.Intrinsic.Control.EndIf
+		F.Intrinsic.Control.EndIf
+
+
+		'Create Tab delimited file for upload                                                                                                   0              1                2                3              4             5           6            7                    8                9                     10                 11                12                13                 14                   15               16                 17                                              
+		F.Intrinsic.String.Build("{17}{1}{0}{2}{0}{3}{0}{4}{0}{5}{0}{6}{0}{7}{0}{8}{0}{9}{0}{10}{0}{11}{0}{12}{0}{13}{0}{14}{0}{15}{16}",V.Ambient.Tab,V.Local.sDateSeq,V.Local.sEmployee,V.Local.sJob,V.Local.sSuffix,V.Local.sSeq,V.Local.sWC,V.Local.sHrsWorked,V.Local.sFlagClsd,V.Local.sFlagIndirect,V.Local.sStartTime,V.Local.sEndTime,V.Local.sRateType,V.Local.sGoodPieces,V.Local.sBadPieces,V.Local.sScrapCode,V.Ambient.NewLine,V.Global.sString,V.Global.sString)
+
+		F.Intrinsic.Control.Label("ForLoopEnd")
+
+	F.Intrinsic.Control.Next(V.Local.iRow)
+
+	F.Data.DataTable.AcceptChanges("dtOEE")
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.If(V.Global.sCallerPgrm,=,"ONLINE")
+		F.Intrinsic.String.Left(v.Ambient.ErrorDescription.Trim,850,V.Global.sErrorDescription)
+		F.Intrinsic.String.Build("Insert into GAB_6407_Error (DateTimeOccur,Description) values (Now(),'{0} Sub: {1} {2}')",v.Ambient.ErrorNumber,v.Ambient.CurrentSubroutine,V.Global.sErrorDescription.PSQLFriendly,V.Global.sSQL)
+		F.ODBC.Connection!PSQL_con.Execute(V.Global.sSQL)
+		F.Intrinsic.Control.CallSub(Unload)
+	F.Intrinsic.Control.Else
+		F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Global.sError)
+		F.Intrinsic.UI.Msgbox(V.Global.sError)
+		F.Intrinsic.Control.CallSub(Unload)
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndTry
+Program.Sub.ProcessData.End
+
+Program.Sub.ValidateJob.Start
+F.Intrinsic.Control.Try
+	V.Local.bValidJob.Declare
+	V.Local.bJobClosed.Declare
+	V.Local.bJobSeqClosed.Declare
+	V.Local.bLaborSeq.Declare
+	V.Local.bFlagSetup.Declare
+	V.Local.sQuery.Declare
+	V.Local.sRet.Declare
+
+	'Validate the Job Operations
+	F.Intrinsic.String.Build("select B.JOB, B.SUFFIX, B.SEQ, B.LMO, B.FLAG_CLOSED, B.FLAG_SET_UP, A.DATE_CLOSED from JOB_HEADER A INNER JOIN JOB_OPERATIONS B ON A.JOB = B.JOB AND A.SUFFIX = B.SUFFIX where B.JOB = '{0}' AND B.SUFFIX = '{1}' AND B.SEQ = '{2}';",V.Args.sJob,V.Args.sSuffix,V.Args.sSeq,V.Local.sQuery)
+	F.ODBC.Connection!PSQL_con.ExecuteAndReturn(V.Local.sQuery,V.Local.sRet)
+	F.Intrinsic.String.Split(V.Local.sRet,"*!*",V.Local.sRet)
+	F.Intrinsic.Control.If(V.Local.sRet(0).Trim,=,"")
+		V.Local.bValidJob.Set(False)
+	F.Intrinsic.Control.Else
+		V.Local.bValidJob.Set(True)
+	F.Intrinsic.Control.EndIf
+
+	F.Intrinsic.Control.If(V.Local.sRet(3).Trim,=,"L")
+		V.Local.bLaborSeq.Set(True)
+	F.Intrinsic.Control.Else
+		V.Local.bLaborSeq.Set(False)
+	F.Intrinsic.Control.EndIf
+
+	F.Intrinsic.Control.If(V.Local.sRet(4).Trim,=,"Y")
+		V.Local.bJobSeqClosed.Set(True)
+	F.Intrinsic.Control.Else
+		V.Local.bJobSeqClosed.Set(False)
+	F.Intrinsic.Control.EndIf
+
+	F.Intrinsic.Control.If(V.Local.sRet(5).Trim,=,"Y")
+		V.Local.bFlagSetup.Set(True)
+	F.Intrinsic.Control.Else
+		V.Local.bFlagSetup.Set(False)
+	F.Intrinsic.Control.EndIf
+
+	F.Intrinsic.Control.If(V.Local.sRet(6).Trim,=,"000000")
+		V.Local.bJobClosed.Set(False)
+	F.Intrinsic.Control.Else
+		V.Local.bJobClosed.Set(True)
+	F.Intrinsic.Control.EndIf
+
+	F.Intrinsic.Variable.AddRV("bValidJob",V.Local.bValidJob,"bLaborSeq",V.Local.bLaborSeq,"bJobSeqClosed",V.Local.bJobSeqClosed,"bFlagsetup",V.Local.bFlagSetup,"bJobClosed",V.Local.bJobClosed)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.If(V.Global.sCallerPgrm,=,"ONLINE")
+		F.Intrinsic.String.Left(v.Ambient.ErrorDescription.Trim,850,V.Global.sErrorDescription)
+		F.Intrinsic.String.Build("Insert into GAB_6407_Error (DateTimeOccur,Description) values (Now(),'{0} Sub: {1} {2}')",v.Ambient.ErrorNumber,v.Ambient.CurrentSubroutine,V.Global.sErrorDescription.PSQLFriendly,V.Global.sSQL)
+		F.ODBC.Connection!PSQL_con.Execute(V.Global.sSQL)
+		F.Intrinsic.Control.CallSub(Unload)
+	F.Intrinsic.Control.Else
+		F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Global.sError)
+		F.Intrinsic.UI.Msgbox(V.Global.sError)
+		F.Intrinsic.Control.CallSub(Unload)
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndTry
+Program.Sub.ValidateJob.End
+
+Program.Sub.ValidateDate.Start
+F.Intrinsic.Control.Try
+	V.Local.bValidDate.Declare
+	V.Local.sDateCC.Declare
+	V.Local.sDateYY.Declare
+	V.Local.sDateMM.Declare
+	V.Local.sDateDD.Declare
+	V.Local.sDate.Declare
+
+	F.Intrinsic.Control.SelectCase(V.Args.sDateInputFormat)
+		F.Intrinsic.Control.Case("YYYYMMDD")
+			F.Intrinsic.String.Left(V.Args.sDateInput,2,V.Local.sDateCC)
+			F.Intrinsic.String.Mid(V.Args.sDateInput,3,2,V.Local.sDateYY)
+			F.Intrinsic.String.Mid(V.Args.sDateInput,5,2,V.Local.sDateMM)
+			F.Intrinsic.String.Right(V.Args.sDateInput,2,V.Local.sDateDD)			
+	F.Intrinsic.Control.EndSelect
+
+	V.Local.bValidDate.Set(False)
+
+	'Validate whether it is a valid date
+	'Set the format of the date to MM/DD/YYYY
+	F.Intrinsic.String.Concat(V.Local.sDateMM,"/",V.Local.sDateDD,"/",V.Local.sDateCC,V.Local.sDateYY,V.Local.sDate)
+	F.Intrinsic.Date.IsDate(V.Local.sDate,V.Local.bValidDate)
+	F.Intrinsic.Control.If(V.Local.bValidDate.Not)
+		F.Intrinsic.String.Concat(V.Local.sDateDD,"/",V.Local.sDateMM,"/",V.Local.sDateCC,V.Local.sDateYY,V.Local.sDate)
+		F.Intrinsic.Date.IsDate(V.Local.sDate,V.Local.bValidDate)
+		F.Intrinsic.Control.If(V.Local.bValidDate.Not)
+			'Invalid Date
+			F.Intrinsic.Variable.AddRV("bValidDate",V.Local.bValidDate,"sRetDate","")
+			F.Intrinsic.Control.ExitSub
+		F.Intrinsic.Control.EndIf
+	F.Intrinsic.Control.EndIf
+
+	F.Intrinsic.Control.If(V.Local.bValidDate)
+		F.Intrinsic.Control.SelectCase(V.Args.sDateOutputFormat)
+			F.Intrinsic.Control.Case("MMDDYY")
+				F.Intrinsic.String.Concat(V.Local.sDateMM,V.Local.sDateDD,V.Local.sDateYY,V.Local.sDate)
+			F.Intrinsic.Control.Case("YYMMDD")
+				F.Intrinsic.String.Concat(V.Local.sDateYY,V.Local.sDateMM,V.Local.sDateDD,V.Local.sDate)
+			F.Intrinsic.Control.Case("YYYYMMDD")
+				F.Intrinsic.String.Concat(V.Local.sDateCC,V.Local.sDateYY,V.Local.sDateMM,V.Local.sDateDD,V.Local.sDate)
+			F.Intrinsic.Control.Case("CCYYMMDD")
+				F.Intrinsic.String.Concat(V.Local.sDateCC,V.Local.sDateYY,V.Local.sDateMM,V.Local.sDateDD,V.Local.sDate)
+		F.Intrinsic.Control.EndSelect
+		F.Intrinsic.Variable.AddRV("bValidDate",V.Local.bValidDate,"sRetDate",V.Local.sDate)
+	F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.If(V.Global.sCallerPgrm,=,"ONLINE")
+		F.Intrinsic.String.Left(v.Ambient.ErrorDescription.Trim,850,V.Global.sErrorDescription)
+		F.Intrinsic.String.Build("Insert into GAB_6407_Error (DateTimeOccur,Description) values (Now(),'{0} Sub: {1} {2}')",v.Ambient.ErrorNumber,v.Ambient.CurrentSubroutine,V.Global.sErrorDescription.PSQLFriendly,V.Global.sSQL)
+		F.ODBC.Connection!PSQL_con.Execute(V.Global.sSQL)
+		F.Intrinsic.Control.CallSub(Unload)
+	F.Intrinsic.Control.Else
+		F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Global.sError)
+		F.Intrinsic.UI.Msgbox(V.Global.sError)
+		F.Intrinsic.Control.CallSub(Unload)
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndTry
+Program.Sub.ValidateDate.End
+
+Program.Sub.ValidateWorkcenter.Start
+F.Intrinsic.Control.Try
+	V.Local.bValidWorkCenter.Declare
+	V.Local.bValidWorkGroup.Declare
+	V.Local.sQuery.Declare
+	V.Local.sRet.Declare
+
+	'Validate that the Workcenter
+	F.Intrinsic.String.Build("SELECT MACHINE FROM WORKCENTERS WHERE MACHINE = '{0}';",V.Args.sWorkcenter,V.Local.sQuery)
+	F.ODBC.Connection!PSQL_con.ExecuteAndReturn(V.Local.sQuery,V.Local.sRet)
+	F.Intrinsic.Control.If(V.Local.sRet,=,"")
+		V.Local.bValidWorkCenter.Set(False)
+	F.Intrinsic.Control.Else
+		V.Local.bValidWorkCenter.Set(True)
+	F.Intrinsic.Control.EndIf
+
+	F.Intrinsic.String.Build("SELECT WORK_GROUP FROM WORKGROUP_HEAD WHERE WORK_GROUP = '{0}';",V.Args.sWorkcenter,V.Local.sQuery)
+	F.ODBC.Connection!PSQL_con.ExecuteAndReturn(V.Local.sQuery,V.Local.sRet)
+	F.Intrinsic.Control.If(V.Local.sRet,=,"")
+		V.Local.bValidWorkGroup.Set(False)
+	F.Intrinsic.Control.Else
+		V.Local.bValidWorkGroup.Set(True)
+	F.Intrinsic.Control.EndIf
+
+	F.Intrinsic.Variable.AddRV("bValidWorkCenter",V.Local.bValidWorkCenter,"bValidWorkGroup",V.Local.bValidWorkGroup)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.If(V.Global.sCallerPgrm,=,"ONLINE")
+		F.Intrinsic.String.Left(v.Ambient.ErrorDescription.Trim,850,V.Global.sErrorDescription)
+		F.Intrinsic.String.Build("Insert into GAB_6407_Error (DateTimeOccur,Description) values (Now(),'{0} Sub: {1} {2}')",v.Ambient.ErrorNumber,v.Ambient.CurrentSubroutine,V.Global.sErrorDescription.PSQLFriendly,V.Global.sSQL)
+		F.ODBC.Connection!PSQL_con.Execute(V.Global.sSQL)
+		F.Intrinsic.Control.CallSub(Unload)
+	F.Intrinsic.Control.Else
+		F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Global.sError)
+		F.Intrinsic.UI.Msgbox(V.Global.sError)
+		F.Intrinsic.Control.CallSub(Unload)
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndTry
+Program.Sub.ValidateWorkcenter.End
+
+Program.Sub.ValidateEmployee.Start
+F.Intrinsic.Control.Try
+	V.Local.bValid.Declare
+	V.Local.sQuery.Declare
+	V.Local.sRet.Declare
+
+	'Validate the employee and that the employee has a rate
+	F.Intrinsic.String.Build("SELECT EMPLOYEE FROM EMPLOYEE_MSTR WHERE EMPLOYEE = '{0}';",V.Args.sEmployee,V.Local.sQuery)
+	F.ODBC.Connection!PSQL_con.ExecuteAndReturn(V.Local.sQuery,V.Local.sRet)
+	F.Intrinsic.Control.If(V.Local.sRet,=,"")
+		V.Local.bValid.Set(False)
+	F.Intrinsic.Control.Else
+		V.Local.bValid.Set(True)
+	F.Intrinsic.Control.EndIf
+
+	F.Intrinsic.Variable.AddRV("bValid",V.Local.bValid)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.If(V.Global.sCallerPgrm,=,"ONLINE")
+		F.Intrinsic.String.Left(v.Ambient.ErrorDescription.Trim,850,V.Global.sErrorDescription)
+		F.Intrinsic.String.Build("Insert into GAB_6407_Error (DateTimeOccur,Description) values (Now(),'{0} Sub: {1} {2}')",v.Ambient.ErrorNumber,v.Ambient.CurrentSubroutine,V.Global.sErrorDescription.PSQLFriendly,V.Global.sSQL)
+		F.ODBC.Connection!PSQL_con.Execute(V.Global.sSQL)
+		F.Intrinsic.Control.CallSub(Unload)
+	F.Intrinsic.Control.Else
+		F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Global.sError)
+		F.Intrinsic.UI.Msgbox(V.Global.sError)
+		F.Intrinsic.Control.CallSub(Unload)
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndTry
+Program.Sub.ValidateEmployee.End
+
+Program.Sub.ValidateTime.Start
+F.Intrinsic.Control.Try
+	V.Local.bValid.Declare
+	V.Local.sQuery.Declare
+	V.Local.sRet.Declare
+	V.Local.sTimeHH.Declare
+	V.Local.sTimeMM.Declare
+	V.Local.sTime.Declare
+
+	'Make the time to be 4 char long (Left Pad with ZERO)
+	F.Intrinsic.String.LPad(V.Args.sTime,"0",4,V.Local.sTime)
+
+	'Validate the Time
+	F.Intrinsic.String.Left(V.Local.sTime,2,V.Local.sTimeHH)
+	F.Intrinsic.String.Mid(V.Local.sTime,3,2,V.Local.sTimeMM)
+
+	'Check whether the Time is numeric
+	F.Intrinsic.Math.IsNumeric(V.Local.sTimeHH,V.Local.bValid)
+	F.Intrinsic.Control.If(V.Local.bValid.Not)
+		'Invalid Time
+		F.Intrinsic.Variable.AddRV("bValid",V.Local.bValid)
+		F.Intrinsic.Control.ExitSub
+	F.Intrinsic.Control.Else
+		F.Intrinsic.Control.If(V.Local.sTimeHH.Long,<,0,"OR",V.Local.sTimeHH,>,23)
+			'Invalid Time
+			F.Intrinsic.Variable.AddRV("bValid",False)
+			F.Intrinsic.Control.ExitSub
+		F.Intrinsic.Control.EndIf
+	F.Intrinsic.Control.EndIf
+
+	F.Intrinsic.Math.IsNumeric(V.Local.sTimeMM,V.Local.bValid)
+	F.Intrinsic.Control.If(V.Local.bValid.Not)
+		'Invalid Time
+		F.Intrinsic.Variable.AddRV("bValid",V.Local.bValid)
+		F.Intrinsic.Control.ExitSub
+	F.Intrinsic.Control.Else
+		F.Intrinsic.Control.If(V.Local.sTimeMM.Long,<,0,"OR",V.Local.sTimeMM,>,59)
+			'Invalid Time
+			F.Intrinsic.Variable.AddRV("bValid",False)
+			F.Intrinsic.Control.ExitSub
+		F.Intrinsic.Control.EndIf
+	F.Intrinsic.Control.EndIf
+
+	'If it reaches here then it is a valid Time
+	F.Intrinsic.Variable.AddRV("bValid",True)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.If(V.Global.sCallerPgrm,=,"ONLINE")
+		F.Intrinsic.String.Left(v.Ambient.ErrorDescription.Trim,850,V.Global.sErrorDescription)
+		F.Intrinsic.String.Build("Insert into GAB_6407_Error (DateTimeOccur,Description) values (Now(),'{0} Sub: {1} {2}')",v.Ambient.ErrorNumber,v.Ambient.CurrentSubroutine,V.Global.sErrorDescription.PSQLFriendly,V.Global.sSQL)
+		F.ODBC.Connection!PSQL_con.Execute(V.Global.sSQL)
+		F.Intrinsic.Control.CallSub(Unload)
+	F.Intrinsic.Control.Else
+		F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Global.sError)
+		F.Intrinsic.UI.Msgbox(V.Global.sError)
+		F.Intrinsic.Control.CallSub(Unload)
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndTry
+Program.Sub.ValidateTime.End
+
+Program.Sub.ValidateQty.Start
+F.Intrinsic.Control.Try
+	V.Local.bValid.Declare
+
+	'Check whether the Qty is numeric
+	F.Intrinsic.Math.IsNumeric(V.Args.sQty,V.Local.bValid)
+	F.Intrinsic.Control.If(V.Local.bValid.Not)
+		'Invalid Qty
+		F.Intrinsic.Variable.AddRV("bValid",V.Local.bValid)
+		F.Intrinsic.Control.ExitSub
+	F.Intrinsic.Control.EndIf
+
+	'If it reaches here then it is a valid Time
+	F.Intrinsic.Variable.AddRV("bValid",True)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.If(V.Global.sCallerPgrm,=,"ONLINE")
+		F.Intrinsic.String.Left(v.Ambient.ErrorDescription.Trim,850,V.Global.sErrorDescription)
+		F.Intrinsic.String.Build("Insert into GAB_6407_Error (DateTimeOccur,Description) values (Now(),'{0} Sub: {1} {2}')",v.Ambient.ErrorNumber,v.Ambient.CurrentSubroutine,V.Global.sErrorDescription.PSQLFriendly,V.Global.sSQL)
+		F.ODBC.Connection!PSQL_con.Execute(V.Global.sSQL)
+		F.Intrinsic.Control.CallSub(Unload)
+	F.Intrinsic.Control.Else
+		F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Global.sError)
+		F.Intrinsic.UI.Msgbox(V.Global.sError)
+		F.Intrinsic.Control.CallSub(Unload)
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndTry
+Program.Sub.ValidateQty.End
+
+Program.Sub.GetQtyFromWoSeq.Start
+F.Intrinsic.Control.Try
+	V.Local.sQuery.Declare
+	V.Local.sRet.Declare
+	V.Local.fEstimatedPieces.Declare
+	V.Local.fCompletedPieces.Declare
+
+	'Get the Estimate Qty and Actual Qty for the Job Sequence
+	F.Intrinsic.String.Build("SELECT UNITS_OPEN AS EstimatedPieces, UNITS_COMPLETE AS CompletedPieces FROM JOB_OPERATIONS WHERE JOB = '{0}' and SUFFIX = '{1}' and SEQ = '{2}';",V.Args.sJob,V.Args.sSuffix,V.Args.sSeq,V.Local.sQuery)
+	F.ODBC.Connection!PSQL_con.ExecuteAndReturn(V.Local.sQuery,V.Local.sRet)
+	F.Intrinsic.Control.If(V.Local.sRet.Trim,<>,"")
+		F.Intrinsic.String.Split(V.Local.sRet,"*!*",V.Local.sRet)
+		V.Local.fEstimatedPieces.Set(V.Local.sRet(0).Float)
+		V.Local.fCompletedPieces.Set(V.Local.sRet(1).Float)
+	F.Intrinsic.Control.Else
+		V.Local.fEstimatedPieces.Set(0.00)
+		V.Local.fCompletedPieces.Set(0.00)
+	F.Intrinsic.Control.EndIf
+
+	F.Intrinsic.Variable.AddRV("fEstimatedPieces",V.Local.fEstimatedPieces,"fCompletedPieces",V.Local.fCompletedPieces)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.If(V.Global.sCallerPgrm,=,"ONLINE")
+		F.Intrinsic.String.Left(v.Ambient.ErrorDescription.Trim,850,V.Global.sErrorDescription)
+		F.Intrinsic.String.Build("Insert into GAB_6407_Error (DateTimeOccur,Description) values (Now(),'{0} Sub: {1} {2}')",v.Ambient.ErrorNumber,v.Ambient.CurrentSubroutine,V.Global.sErrorDescription.PSQLFriendly,V.Global.sSQL)
+		F.ODBC.Connection!PSQL_con.Execute(V.Global.sSQL)
+		F.Intrinsic.Control.CallSub(Unload)
+	F.Intrinsic.Control.Else
+		F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Ambient.ScriptPath,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Global.sError)
+		F.Intrinsic.UI.Msgbox(V.Global.sError)
+		F.Intrinsic.Control.CallSub(Unload)
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndTry
+Program.Sub.GetQtyFromWoSeq.End
+
+Program.Sub.Comments.Start
+${$0$}$$}$$}$12:00:00 AM$}$False
+Program.Sub.Comments.End
